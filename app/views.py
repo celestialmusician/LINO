@@ -48,13 +48,13 @@ class ProductDetailView(View):
 
         products = {
 
-    "noir": {
+    "ONE MILLION": {
 
-        "name": "NOIR",
+        "name": "ONE MILLION",
 
         "price": "₹ 3,999",
 
-        "image": "images/products/noir.png",
+        "image": "images/products/ONE MILLION.png",
 
         "subtitle": "Deep Woody Luxury",
 
@@ -62,7 +62,7 @@ class ProductDetailView(View):
         "A sophisticated fragrance built around rich woods, smoky spices and warm amber.",
 
         "story":
-        "NOIR is crafted for evenings of quiet confidence, blending modern elegance with timeless depth.",
+        "ONE MILLION is crafted for evenings of quiet confidence, blending modern elegance with timeless depth.",
 
         "volume": "100 ml",
 
@@ -78,13 +78,13 @@ class ProductDetailView(View):
 
     },
 
-    "blanc": {
+    "MARJ": {
 
-        "name": "BLANC",
+        "name": "MARJ",
 
         "price": "₹ 3,499",
 
-        "image": "images/products/blanc.png",
+        "image": "images/products/MARJ.png",
 
         "subtitle": "Fresh White Musk",
 
@@ -92,7 +92,7 @@ class ProductDetailView(View):
         "A clean and elegant composition with white musk and delicate florals.",
 
         "story":
-        "BLANC celebrates purity and effortless sophistication with a fresh modern signature.",
+        "MARJ celebrates purity and effortless sophistication with a fresh modern signature.",
 
         "volume": "100 ml",
 
@@ -108,13 +108,13 @@ class ProductDetailView(View):
 
     },
 
-    "oud-royale": {
+    "SUBAYA": {
 
-        "name": "OUD ROYALE",
+        "name": "SUBAYA",
 
         "price": "₹ 5,999",
 
-        "image": "images/products/oud-royale.png",
+        "image": "images/products/SUBAYA.png",
 
         "subtitle": "Royal Oud Essence",
 
@@ -122,7 +122,7 @@ class ProductDetailView(View):
         "An intense oriental fragrance with precious oud and warm spices.",
 
         "story":
-        "OUD ROYALE is inspired by royal palaces, rare woods and timeless luxury.",
+        "SUBAYA is inspired by royal palaces, rare woods and timeless luxury.",
 
         "volume": "100 ml",
 
@@ -136,7 +136,7 @@ class ProductDetailView(View):
 
         "base_notes": "Leather • Amber • Sandalwood",
 
-    }
+    },
 
 }
 
@@ -144,7 +144,7 @@ class ProductDetailView(View):
 
         if not product:
 
-            product = products["noir"]
+            product = products["ONE MILLION"]
 
         return render(
 
