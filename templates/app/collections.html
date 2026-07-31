@@ -69,24 +69,47 @@ Collections | LINO
 
     <div class="toolbar-right">
 
-        <button
-            class="filter-btn"
-            id="openFilter">
+        <div class="premium-filter">
 
-            <i class="fa-solid fa-sliders"></i>
+    <label for="categoryFilter">
 
-            Filter
+        <i class="fa-solid fa-layer-group"></i>
 
-        </button>
+    </label>
 
-        <button
-            class="sort-btn">
+    <select id="categoryFilter">
 
-            <i class="fa-solid fa-arrow-down-wide-short"></i>
+        <option value="all">All Collections</option>
 
-            Sort
+        <option value="oudh">Oudh</option>
 
-        </button>
+        <option value="attar">Attar</option>
+
+        <option value="spray">Perfume Spray</option>
+
+        <option value="musk">Musk</option>
+
+        <option value="floral">Floral</option>
+
+    </select>
+
+</div>  
+<div class="premium-sort">
+
+    <i class="fa-solid fa-arrow-down-wide-short"></i>
+
+    <select id="sortProducts">
+
+        <option value="featured">Featured</option>
+        <option value="az">A - Z</option>
+        <option value="za">Z - A</option>
+        <option value="low-high">Price: Low to High</option>
+        <option value="high-low">Price: High to Low</option>
+        <option value="newest">Newest</option>
+
+    </select>
+
+</div>
 
     </div>
 
