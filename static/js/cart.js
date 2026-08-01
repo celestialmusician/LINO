@@ -42,20 +42,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function updateCartCount() {
 
-        const badge =
-            document.getElementById("cartCount");
+        const badges =
+            document.querySelectorAll(".cart-count");
 
-        if (!badge) return;
+        if (!badges.length) return;
 
         const cart = getCart();
 
         const total =
             cart.reduce(
-                (sum, item) => sum + item.quantity,
+                (sum, item) => sum + (item.quantity || 1),
                 0
             );
 
-        badge.textContent = total;
+        badges.forEach(badge => {
+
+            badge.textContent = total;
+
+        });
 
     }
 

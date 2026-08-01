@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    const badge =
-        document.getElementById("cartCount");
+    const badges =
+        document.querySelectorAll(".cart-count");
 
-    if (!badge) return;
+    if (!badges.length) return;
 
     const cart =
         JSON.parse(
@@ -18,6 +18,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
-    badge.textContent = total;
+    badges.forEach(badge => {
+
+        badge.textContent = total;
+
+    });
 
 });

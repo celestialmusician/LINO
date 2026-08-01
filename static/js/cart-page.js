@@ -145,13 +145,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         <div class="cart-quantity">
 
-                            <span>
+                            <button
+                                class="qty-btn qty-minus"
+                                data-index="${index}"
+                                aria-label="Decrease quantity">
 
-                                Qty : ${item.quantity}
+                                &minus;
+
+                            </button>
+
+                            <span data-qty-value="${index}">
+
+                                ${item.quantity}
 
                             </span>
 
-</div>
+                            <button
+                                class="qty-btn qty-plus"
+                                data-index="${index}"
+                                aria-label="Increase quantity">
+
+                                &plus;
+
+                            </button>
 
                         </div>
 
@@ -212,6 +228,80 @@ document.addEventListener("DOMContentLoaded", () => {
                 saveCart(cart);
 
                 renderCart();
+
+                if (window.updateCartCount) {
+
+                    window.updateCartCount();
+
+                }
+
+            });
+
+        });
+
+        //----------------------------------------
+        // INCREASE QUANTITY
+        //----------------------------------------
+
+        document.querySelectorAll(".qty-plus").forEach(btn => {
+
+            btn.addEventListener("click", () => {
+
+                const cart = getCart();
+
+                const index = Number(btn.dataset.index);
+
+                if (!cart[index]) return;
+
+                cart[index].quantity += 1;
+
+                saveCart(cart);
+
+                renderCart();
+
+                if (window.updateCartCount) {
+
+                    window.updateCartCount();
+
+                }
+
+            });
+
+        });
+
+        //----------------------------------------
+        // DECREASE QUANTITY
+        //----------------------------------------
+
+        document.querySelectorAll(".qty-minus").forEach(btn => {
+
+            btn.addEventListener("click", () => {
+
+                const cart = getCart();
+
+                const index = Number(btn.dataset.index);
+
+                if (!cart[index]) return;
+
+                if (cart[index].quantity > 1) {
+
+                    cart[index].quantity -= 1;
+
+                } else {
+
+                    cart.splice(index, 1);
+
+                }
+
+                saveCart(cart);
+
+                renderCart();
+
+                if (window.updateCartCount) {
+
+                    window.updateCartCount();
+
+                }
 
             });
 

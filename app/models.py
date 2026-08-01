@@ -111,6 +111,12 @@ class Product(models.Model):
         default=0
     )
 
+    sku = models.CharField(
+        max_length=50,
+        unique=True,
+        blank=True
+    )
+
     featured = models.BooleanField(
         default=False
     )
@@ -137,8 +143,50 @@ class Product(models.Model):
 
             self.slug = slugify(self.name)
 
+        if not self.sku:
+
+            self.sku = f"LINO-{slugify(self.name).upper()}"
+
         super().save(*args, **kwargs)
 
     def __str__(self):
 
         return self.name
+
+
+# ==================================================
+# PRODUCT GALLERY
+# ==================================================
+
+class ProductImage(models.Model):
+
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name="gallery"
+    )
+
+    image = models.ImageField(
+        upload_to="products/gallery/"
+    )
+
+    alt_text = models.CharField(
+        max_length=150,
+        blank=True
+    )
+
+    ordering = models.PositiveIntegerField(
+        default=0
+    )
+
+    class Meta:
+
+        ordering = ["ordering"]
+
+        verbose_name = "Product Image"
+
+        verbose_name_plural = "Product Gallery"
+
+    def __str__(self):
+
+        return f"{self.product.name} - Gallery Image"
