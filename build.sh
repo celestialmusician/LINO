@@ -5,6 +5,7 @@ set -o errexit
 pip install -r requirements.txt
 python manage.py collectstatic --no-input
 python manage.py migrate
+python seed_products.py
 python sync_categories.py
 python auto_import_products.py
 python cleanup_duplicates.py
