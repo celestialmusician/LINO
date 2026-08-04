@@ -1,6 +1,8 @@
 {% extends 'app/base.html' %}
 {% load static %}
 
+{% block title %}Checkout | LINO{% endblock %}
+
 {% block content %}
 
 <section class="checkout-page">
@@ -45,58 +47,123 @@
 
                     <h2>Billing Details</h2>
 
-                    <form autocomplete="off">
+                    <form
+                        method="POST"
+                        action="{% url 'checkout' %}"
+                        id="checkoutForm"
+                        autocomplete="off">
+
+                        {% csrf_token %}
+
+                        <!-- Hidden field populated by JS from localStorage -->
+                        <input type="hidden" name="cart_data" id="cartDataInput">
+
+                        {% if messages %}
+                        <div class="auth-messages">
+                            {% for message in messages %}
+                            <div class="auth-message auth-message--{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        {% if form.errors %}
+                        <div class="form-errors-banner">
+                            <p><strong>Please check the following details:</strong></p>
+                            <ul>
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ field|title }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
 
                         <div class="form-row">
 
                             <input
                                 type="text"
+                                name="first_name"
                                 placeholder="First Name"
+                                value="{{ form.first_name.value|default:'' }}"
+                                required
                             >
 
                             <input
                                 type="text"
+                                name="last_name"
                                 placeholder="Last Name"
+                                value="{{ form.last_name.value|default:'' }}"
+                                required
                             >
 
                         </div>
 
                         <input
                             type="email"
+                            name="email"
                             placeholder="Email Address"
+                            value="{{ form.email.value|default:'' }}"
+                            required
                         >
 
                         <input
                             type="tel"
+                            name="phone"
                             placeholder="Phone Number"
+                            value="{{ form.phone.value|default:'' }}"
+                            required
                         >
 
                         <textarea
-                            rows="5"
+                            name="address"
+                            rows="4"
                             placeholder="Complete Address"
-                        ></textarea>
+                            required
+                        >{{ form.address.value|default:'' }}</textarea>
 
                         <div class="form-row">
 
                             <input
                                 type="text"
+                                name="city"
                                 placeholder="City"
+                                value="{{ form.city.value|default:'' }}"
+                                required
                             >
 
                             <input
                                 type="text"
+                                name="state"
                                 placeholder="State"
+                                value="{{ form.state.value|default:'' }}"
+                                required
                             >
 
                         </div>
 
-                        <input
-                            type="text"
-                            placeholder="PIN Code"
-                        >
+                        <div class="form-row">
+
+                            <input
+                                type="text"
+                                name="pincode"
+                                placeholder="PIN Code (6 digits)"
+                                value="{{ form.pincode.value|default:'' }}"
+                                required
+                            >
+
+                            <select name="payment_method" class="checkout-select" required>
+                                <option value="cod">Cash on Delivery (COD)</option>
+                                <option value="upi">UPI / GPay / PhonePe</option>
+                                <option value="card">Credit / Debit Card</option>
+                            </select>
+
+                        </div>
 
                         <button
-                            type="button"
+                            type="submit"
                             id="placeOrderBtn"
                             class="checkout-btn">
 
@@ -106,7 +173,20 @@
 
                         <div class="checkout-features">
 
-                            ...
+                            <div class="checkout-feature">
+                                <i class="fa-solid fa-lock"></i>
+                                <span>Secure Checkout</span>
+                            </div>
+
+                            <div class="checkout-feature">
+                                <i class="fa-solid fa-truck-fast"></i>
+                                <span>Free Delivery</span>
+                            </div>
+
+                            <div class="checkout-feature">
+                                <i class="fa-solid fa-rotate-left"></i>
+                                <span>Easy Returns</span>
+                            </div>
 
                         </div>
 

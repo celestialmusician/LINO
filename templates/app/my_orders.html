@@ -1,6 +1,8 @@
 {% extends 'app/base.html' %}
 {% load static %}
 
+{% block title %}My Orders | LINO{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/my_orders.css' %}">
 {% endblock %}
@@ -21,14 +23,94 @@
 
     </div>
 
-    <div
-        class="orders-list"
-        id="ordersList">
+    <div class="orders-list" id="ordersList">
+
+        {% if orders %}
+
+            {% for order in orders %}
+
+            <div class="order-card">
+
+                {% for item in order.items.all %}
+
+                <div class="order-item-row">
+
+                    {% if item.product and item.product.image %}
+                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                    {% endif %}
+
+                    <div class="order-info">
+
+                        <h3>
+                            {% if item.product %}
+                                {{ item.product.name }}
+                            {% else %}
+                                Product Unavailable
+                            {% endif %}
+                        </h3>
+
+                        <p><strong>Qty:</strong> {{ item.quantity }}</p>
+
+                        <p><strong>Price:</strong> ₹ {{ item.price_at_order }}</p>
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+                <div class="order-footer">
+
+                    <div class="order-meta">
+
+                        <p><strong>Order ID:</strong> {{ order.order_id }}</p>
+
+                        <p><strong>Date:</strong> {{ order.created_at|date:"d M Y" }}</p>
+
+                        <p><strong>Total:</strong> ₹ {{ order.total }}</p>
+
+                    </div>
+
+                    <div class="order-right">
+
+                        <div class="status {{ order.status }}">
+
+                            {{ order.get_status_display }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="empty-orders">
+
+                <h2>No Orders Yet</h2>
+
+                <p>
+                    Your luxury fragrance journey starts here.
+                </p>
+
+                <a
+                    href="{% url 'collections' %}"
+                    class="shop-btn">
+
+                    Explore Collection
+
+                </a>
+
+            </div>
+
+        {% endif %}
 
     </div>
 
 </section>
-
-<script src="{% static 'js/my_orders.js' %}"></script>
 
 {% endblock %}

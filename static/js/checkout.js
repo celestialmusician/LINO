@@ -2,169 +2,136 @@
 // LINO - CHECKOUT
 //==================================================
 
-const container = document.getElementById("checkoutItems");
-const subtotal = document.getElementById("subtotal");
-const grandTotal = document.getElementById("grandTotal");
-const placeOrderBtn = document.getElementById("placeOrderBtn");
+document.addEventListener("DOMContentLoaded", () => {
 
-const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const container    = document.getElementById("checkoutItems");
+    const subtotalEl   = document.getElementById("subtotal");
+    const grandTotalEl = document.getElementById("grandTotal");
+    const summaryCount = document.getElementById("summaryCount");
+    const form         = document.getElementById("checkoutForm");
+    const cartDataInput= document.getElementById("cartDataInput");
 
-let total = 0;
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-//--------------------------------------
-// EMPTY CART
-//--------------------------------------
+    let total = 0;
 
-if (cart.length === 0) {
+    //--------------------------------------
+    // EMPTY CART
+    //--------------------------------------
 
-    container.innerHTML = `
+    if (!container) return;
 
-        <div class="empty-checkout">
+    if (cart.length === 0) {
 
-            <h3>Your Bag is Empty</h3>
+        container.innerHTML = `
 
-            <p>Add your favourite fragrance to continue.</p>
+            <div class="empty-checkout">
 
-        </div>
+                <h3>Your Bag is Empty</h3>
 
-    `;
-
-    subtotal.textContent = "₹0";
-    grandTotal.textContent = "₹0";
-
-} else {
-
-    cart.forEach(item => {
-
-        const price =
-            Number(item.price.replace(/[^\d]/g, ""));
-
-        const itemTotal =
-            price * item.quantity;
-
-        total += itemTotal;
-
-        container.innerHTML += `
-
-            <div class="checkout-item">
-
-                <img src="${item.image}"
-                     alt="${item.name}">
-
-                <div class="checkout-info">
-
-                    <h4>${item.name}</h4>
-
-                    <p>Qty : ${item.quantity}</p>
-
-                </div>
-
-                <strong>
-
-                    ₹${itemTotal.toLocaleString("en-IN")}
-
-                </strong>
+                <p>Add your favourite fragrance to continue.</p>
 
             </div>
 
         `;
 
-    });
+        if (subtotalEl)   subtotalEl.textContent   = "₹0";
+        if (grandTotalEl) grandTotalEl.textContent = "₹0";
+        if (summaryCount) summaryCount.textContent = "0 Items";
 
-    subtotal.textContent =
-        `₹${total.toLocaleString("en-IN")}`;
-
-    grandTotal.textContent =
-        `₹${total.toLocaleString("en-IN")}`;
-
-}
-
-//--------------------------------------
-// PLACE ORDER
-//--------------------------------------
-
-if (placeOrderBtn) {
-
-    placeOrderBtn.addEventListener("click", () => {
-
-        if (cart.length === 0) {
-
-            alert("Your cart is empty.");
-
-            return;
-
-        }
-
-        const loggedIn = localStorage.getItem("loggedIn");
-
-        if (loggedIn !== "true") {
-
-            const goToLogin = confirm(
-                "🔒 You need to sign in first to place your order.\n\nGo to Login page?"
-            );
-
-            if (goToLogin) {
-
-                window.location.href = "/login/";
-
-            }
-
-            return;
-
-        }
+    } else {
 
         //--------------------------------------
-// SAVE ORDER
-//--------------------------------------
+        // RENDER ITEMS
+        //--------------------------------------
 
-let orders = JSON.parse(localStorage.getItem("orders")) || [];
+        if (summaryCount) {
+            summaryCount.textContent =
+                `${cart.length} Item${cart.length !== 1 ? "s" : ""}`;
+        }
 
-cart.forEach(item => {
+        cart.forEach(item => {
 
-    orders.push({
+            const rawPrice = String(item.price).replace(/[^\d.]/g, "");
+            const price    = parseFloat(rawPrice) || 0;
+            const itemTotal = price * (item.quantity || 1);
 
-        id: "SCN" + Date.now(),
+            total += itemTotal;
 
-        name: item.name,
+            container.innerHTML += `
 
-        image: item.image,
+                <div class="checkout-item">
 
-        quantity: item.quantity,
+                    <img src="${item.image}"
+                         alt="${item.name}">
 
-        price: item.price,
+                    <div class="checkout-info">
 
-        date: new Date().toLocaleDateString("en-IN", {
+                        <h4>${item.name}</h4>
 
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
+                        <p>Qty : ${item.quantity || 1}</p>
 
-        }),
+                    </div>
 
-        status: "Delivered"
+                    <strong>
 
-    });
+                        ₹${itemTotal.toLocaleString("en-IN")}
+
+                    </strong>
+
+                </div>
+
+            `;
+
+        });
+
+        if (subtotalEl) {
+            subtotalEl.textContent =
+                `₹${total.toLocaleString("en-IN")}`;
+        }
+
+        if (grandTotalEl) {
+            grandTotalEl.textContent =
+                `₹${total.toLocaleString("en-IN")}`;
+        }
+
+    }
+
+    //--------------------------------------
+    // FORM SUBMIT → inject cart JSON
+    //--------------------------------------
+
+    if (form) {
+
+        form.addEventListener("submit", (e) => {
+
+            if (cart.length === 0) {
+                e.preventDefault();
+                alert("Your cart is empty. Please add items before checking out.");
+                return;
+            }
+
+            // Populate hidden field with cart JSON
+            if (cartDataInput) {
+                cartDataInput.value = JSON.stringify(cart);
+            }
+
+            // Clear cart from localStorage after successful form submit
+            // (happens after redirect, so we store a flag)
+            sessionStorage.setItem("clearCartOnLoad", "true");
+
+        });
+
+    }
 
 });
 
-localStorage.setItem(
+//--------------------------------------
+// CLEAR CART IF RETURNING FROM ORDER SUCCESS
+//--------------------------------------
 
-    "orders",
-
-    JSON.stringify(orders)
-
-);
-
-        localStorage.removeItem("cart");
-
-        if (typeof updateCartCount === "function") {
-
-            updateCartCount();
-
-        }
-
-        window.location.href = "/order-success/";
-
-    });
-
+if (sessionStorage.getItem("clearCartOnLoad") === "true") {
+    localStorage.removeItem("cart");
+    sessionStorage.removeItem("clearCartOnLoad");
+    if (typeof updateCartCount === "function") updateCartCount();
 }

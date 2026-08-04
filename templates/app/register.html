@@ -1,6 +1,8 @@
 {% extends 'app/base.html' %}
 {% load static %}
 
+{% block title %}Create Account | LINO{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/register.css' %}">
 {% endblock %}
@@ -39,30 +41,54 @@
 
         <div class="register-right">
 
-            <form>
+            {% if messages %}
+            <div class="auth-messages">
+                {% for message in messages %}
+                <div class="auth-message auth-message--{{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="POST" action="{% url 'register' %}">
+
+                {% csrf_token %}
 
                 <input
                     type="text"
-                    placeholder="Full Name">
+                    name="full_name"
+                    placeholder="Full Name"
+                    value="{{ request.POST.full_name }}"
+                    required>
 
                 <input
                     type="email"
-                    placeholder="Email Address">
+                    name="email"
+                    placeholder="Email Address"
+                    value="{{ request.POST.email }}"
+                    required>
 
                 <input
                     type="tel"
-                    placeholder="Mobile Number">
+                    name="phone"
+                    placeholder="Mobile Number"
+                    value="{{ request.POST.phone }}">
 
                 <input
                     type="password"
-                    placeholder="Password">
+                    name="password"
+                    placeholder="Password (min 8 characters)"
+                    required>
 
                 <input
                     type="password"
-                    placeholder="Confirm Password">
+                    name="confirm_password"
+                    placeholder="Confirm Password"
+                    required>
 
                 <button
-                    type="button"
+                    type="submit"
                     id="registerBtn">
 
                     Create Account
@@ -88,7 +114,5 @@
     </div>
 
 </section>
-
-<script src="{% static 'js/register.js' %}"></script>
 
 {% endblock %}

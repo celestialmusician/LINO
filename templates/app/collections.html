@@ -61,7 +61,7 @@ Collections | LINO
 
         <span class="collection-count">
 
-            
+            {{ products.count }} Fragrance{{ products.count|pluralize }}
 
         </span>
 
@@ -77,23 +77,20 @@ Collections | LINO
 
     </label>
 
-    <select id="categoryFilter">
+    <select id="categoryFilter" onchange="if(this.value==='all'){window.location.href='{% url 'collections' %}';}else{window.location.href='{% url 'collections' %}?category='+this.value;}">
 
-        <option value="all">All Collections</option>
+        <option value="all" {% if not selected_category %}selected{% endif %}>All Collections</option>
 
-        <option value="oudh">Oudh</option>
-
-        <option value="attar">Attar</option>
-
-        <option value="spray">Perfume Spray</option>
-
-        <option value="musk">Musk</option>
-
-        <option value="floral">Floral</option>
+        {% for cat in categories %}
+        <option value="{{ cat.slug }}" {% if selected_category == cat.slug %}selected{% endif %}>
+            {{ cat.name }}
+        </option>
+        {% endfor %}
 
     </select>
 
-</div>  
+</div>
+
 <div class="premium-sort">
 
     <i class="fa-solid fa-arrow-down-wide-short"></i>
@@ -165,22 +162,6 @@ Collections | LINO
 
     </div>
 
-    <!-- Collection -->
-
-    <div class="filter-group">
-
-        <h4>Collection</h4>
-
-        <label><input type="checkbox"> ONE MILLION</label>
-
-        <label><input type="checkbox"> MARJ</label>
-
-        <label><input type="checkbox"> SUBAYA</label>
-
-        <label><input type="checkbox"> MIDNIGHT</label>
-
-    </div>
-
     <!-- Bottle Size -->
 
     <div class="filter-group">
@@ -215,7 +196,7 @@ Collections | LINO
 
 
 <!--==========================================
-            FILTER
+            FILTER PILLS
 ===========================================-->
 
 <section class="collections-filter">
@@ -224,35 +205,15 @@ Collections | LINO
 
         <div class="filter-wrapper">
 
-            <button class="filter-btn active">
-
+            <a href="{% url 'collections' %}" class="filter-btn {% if not selected_category %}active{% endif %}">
                 All
+            </a>
 
-            </button>
-
-            <button class="filter-btn">
-
-                Men
-
-            </button>
-
-            <button class="filter-btn">
-
-                Women
-
-            </button>
-
-            <button class="filter-btn">
-
-                Unisex
-
-            </button>
-
-            <button class="filter-btn">
-
-                Signature
-
-            </button>
+            {% for cat in categories %}
+            <a href="{% url 'collections' %}?category={{ cat.slug }}" class="filter-btn {% if selected_category == cat.slug %}active{% endif %}">
+                {{ cat.name }}
+            </a>
+            {% endfor %}
 
         </div>
 
@@ -269,280 +230,56 @@ Collections | LINO
 
     <div class="container-custom">
 
-        <div class="products-grid">
+        {% if products %}
 
-
-            <!-- ONE MILLION -->
-
-           <article
-    class="product-card quick-view-btn"
-    data-name="ONE MILLION"
-    data-price="₹ 4,999"
-    data-subtitle="Dark Woody Elegance"
-    data-image="{% static 'images/products/ONE MILLION.png' %}"
-    data-slug="ONE MILLION"
-    data-link="/product/ONE MILLION/">
-
-    <!-- Wishlist -->
-
-    <div class="product-wishlist">
-
-        <i class="fa-regular fa-heart"></i>
-
-    </div>
-
-    <!-- Product Image -->
-
-    <a href="#">
-
-        <img
-            src="{% static 'images/products/ONE MILLION.png' %}"
-            alt="ONE MILLION">
-
-    </a>
-
-    <!-- Product Info -->
-
-    <h3>ONE MILLION</h3>
-
-    <p>Eau De Parfum</p>
-
-    <span>₹ 4,999</span>
-
-</article>
-
-
-            <!-- MARJ -->
+            {% for product in products %}
 
             <article
-    class="product-card quick-view-btn"
+                class="product-card quick-view-btn"
+                data-name="{{ product.name }}"
+                data-price="₹ {{ product.price }}"
+                data-subtitle="{{ product.subtitle }}"
+                data-image="{{ product.image.url }}"
+                data-slug="{{ product.slug }}"
+                data-link="{% url 'product-detail' product.slug %}">
 
-    data-name="MARJ"
-    data-price="₹ 3,499"
-    data-subtitle="Fresh Floral Elegance"
-    data-image="{% static 'images/products/MARJ.png' %}"
-    data-slug="MARJ"
-    data-link="/product/MARJ/">
+                <div class="product-wishlist">
 
-    <div class="product-wishlist">
+                    <i class="fa-regular fa-heart"></i>
 
-        <i class="fa-regular fa-heart"></i>
+                </div>
 
-    </div>
+                <a href="{% url 'product-detail' product.slug %}">
 
-    <a href="#">
+                    <img
+                        src="{{ product.image.url }}"
+                        alt="{{ product.name }}">
 
-        <img
-            src="{% static 'images/products/MARJ.png' %}"
-            alt="MARJ">
+                </a>
 
-    </a>
+                <h3>{{ product.name }}</h3>
 
-    <h3>MARJ</h3>
+                <p>{{ product.concentration }}</p>
 
-    <p>Eau De Parfum</p>
+                <span>₹ {{ product.price }}</span>
 
-    <span>₹ 3,499</span>
+            </article>
 
-</article>
+            {% endfor %}
 
+        {% else %}
 
-            <!-- SUBAYA -->
+            <div class="empty-collections">
 
-            <article
-    class="product-card quick-view-btn"
-    data-name="SUBAYA"
-    data-price="₹ 5,999"
-    data-subtitle="Royal Oriental Oud"
-    data-image="{% static 'images/products/SUBAYA.png' %}"
-    data-slug="SUBAYA"
-    data-link="/product/SUBAYA/">
+                <i class="fa-solid fa-spray-can-sparkles"></i>
 
-    <!-- Wishlist -->
+                <h2>No Fragrances Found</h2>
 
-    <div class="product-wishlist">
+                <p>Check back soon for our latest collection.</p>
 
-        <i class="fa-regular fa-heart"></i>
+            </div>
 
-    </div>
-
-    <!-- Product Image -->
-
-    <a href="#">
-
-        <img
-            src="{% static 'images/products/SUBAYA.png' %}"
-            alt="SUBAYA">
-
-    </a>
-
-    <!-- Product Info -->
-
-    <h3>SUBAYA</h3>
-
-    <p>Royal Oriental Oud</p>
-
-    <span>₹ 5,999</span>
-
-</article>
-
-<!-- OUDH KUWAITY -->
-
-<article
-    class="product-card quick-view-btn"
-    data-name="OUDH KUWAITY"
-    data-price="₹ 5,999"
-    data-subtitle="Authentic Arabian Oud"
-    data-image="{% static 'images/products/OUDH-KUWAITY.png' %}"
-    data-slug="OUDH-KUWAITY"
-    data-link="/product/OUDH-KUWAITY/">
-
-    <!-- Wishlist -->
-
-    <div class="product-wishlist">
-
-        <i class="fa-regular fa-heart"></i>
-
-    </div>
-
-    <!-- Product Image -->
-
-    <a href="#">
-
-        <img
-            src="{% static 'images/products/OUDH-KUWAITY.png' %}"
-            alt="OUDH KUWAITY">
-
-    </a>
-
-    <!-- Product Info -->
-
-    <h3>OUDH KUWAITY</h3>
-
-    <p>Authentic Arabian Oud</p>
-
-    <span>₹ 5,999</span>
-
-</article>
-
-<!-- MUSK RIZAL -->
-
-<article
-    class="product-card quick-view-btn"
-    data-name="MUSK RIZAL"
-    data-price="₹ 5,999"
-    data-subtitle="Warm & Refined Musk"
-    data-image="{% static 'images/products/MUSK-RIZAL.png' %}"
-    data-slug="MUSK-RIZAL"
-    data-link="/product/MUSK-RIZAL/">
-
-    <!-- Wishlist -->
-
-    <div class="product-wishlist">
-
-        <i class="fa-regular fa-heart"></i>
-
-    </div>
-
-    <!-- Product Image -->
-
-    <a href="#">
-
-        <img
-            src="{% static 'images/products/MUSK-RIZAL.png' %}"
-            alt="MUSK RIZAL">
-
-    </a>
-
-    <!-- Product Info -->
-
-    <h3>MUSK RIZAL</h3>
-
-    <p>Warm & Refined Musk</p>
-
-    <span>₹ 5,999</span>
-
-</article>
-
-<!-- JANNATH AL FIRDOUS -->
-
-<article
-    class="product-card quick-view-btn"
-    data-name="JANNATH AL FIRDOUS"
-    data-price="₹ 5,999"
-    data-subtitle="Floral & Woody Elegance"
-    data-image="{% static 'images/products/JANNATH-AL-FIRDOUS.png' %}"
-    data-slug="JANNATH-AL-FIRDOUS"
-    data-link="/product/JANNATH-AL-FIRDOUS/">
-
-    <!-- Wishlist -->
-
-    <div class="product-wishlist">
-
-        <i class="fa-regular fa-heart"></i>
-
-    </div>
-
-    <!-- Product Image -->
-
-    <a href="#">
-
-        <img
-            src="{% static 'images/products/JANNATH-AL-FIRDOUS.png' %}"
-            alt="JANNATH AL FIRDOUS">
-
-    </a>
-
-    <!-- Product Info -->
-
-    <h3>JANNATH AL FIRDOUS</h3>
-
-    <p>Floral & Woody Elegance</p>
-
-    <span>₹ 5,999</span>
-
-</article>
-
-<!-- NOORA -->
-
-<article
-    class="product-card quick-view-btn"
-    data-name="NOORA"
-    data-price="₹ 5,999"
-    data-subtitle="Graceful Floral Elegance"
-    data-image="{% static 'images/products/NOORA.png' %}"
-    data-slug="NOORA"
-    data-link="/product/NOORA/">
-
-    <!-- Wishlist -->
-
-    <div class="product-wishlist">
-
-        <i class="fa-regular fa-heart"></i>
-
-    </div>
-
-    <!-- Product Image -->
-
-    <a href="#">
-
-        <img
-            src="{% static 'images/products/NOORA.png' %}"
-            alt="NOORA">
-
-    </a>
-
-    <!-- Product Info -->
-
-    <h3>NOORA</h3>
-
-    <p>Graceful Floral Elegance</p>
-
-    <span>₹ 5,999</span>
-
-</article>
-
-        </div>
+        {% endif %}
 
     </div>
 

@@ -1,0 +1,670 @@
+/*==================================================
+    LINO PERFUMS – ULTRA-LUXURY ADMIN THEME v3.0
+    Bespoke White & Gold Perfumerie Dashboard
+==================================================*/
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=Libre+Bodoni:ital,wght@0,600;0,700;1,400&display=swap');
+
+:root {
+    --primary: #111111;
+    --header-bg: #111111;
+    --accent: #B8955A;
+    --accent-hover: #C9A96E;
+    --accent-light: #F8F5F0;
+    --body-bg: #FAF9F6;
+    --card-bg: #FFFFFF;
+    --border-color: #E6E4DF;
+    --text-main: #111111;
+    --text-muted: #666666;
+    --font-heading: "Cormorant Garamond", Georgia, serif;
+    --font-logo: "Libre Bodoni", Georgia, serif;
+    --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ==========================================
+   GLOBAL RESET & BASE
+========================================== */
+
+html, body {
+    font-family: var(--font-body) !important;
+    background-color: var(--body-bg) !important;
+    color: var(--text-main) !important;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    color: var(--text-main) !important;
+    text-decoration: none !important;
+    transition: color 0.2s ease !important;
+}
+
+a:hover {
+    color: var(--accent) !important;
+}
+
+/* ==========================================
+   HEADER & NAVBAR
+========================================== */
+
+#header {
+    background: #111111 !important;
+    color: #FAFAF8 !important;
+    padding: 14px 36px !important;
+    border-bottom: 2px solid var(--accent) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+.admin-brand-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    text-decoration: none !important;
+}
+
+.admin-logo-img {
+    height: 38px !important;
+    width: auto !important;
+    object-fit: contain !important;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    transition: transform 0.3s ease !important;
+}
+
+.admin-brand-link:hover .admin-logo-img {
+    transform: scale(1.05) !important;
+}
+
+.admin-brand-tag {
+    font-family: var(--font-body) !important;
+    font-size: 11px !important;
+    letter-spacing: 3px !important;
+    color: var(--accent) !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    border-left: 1px solid rgba(184, 149, 90, 0.4) !important;
+    padding-left: 14px !important;
+    margin-left: 4px !important;
+}
+
+.admin-brand-text {
+    font-family: var(--font-logo) !important;
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    letter-spacing: 3px !important;
+    color: #FAFAF8 !important;
+    text-transform: uppercase !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+.admin-brand-text::after {
+    content: "• ADMIN PANEL";
+    font-family: var(--font-body) !important;
+    font-size: 10px !important;
+    letter-spacing: 3px !important;
+    color: var(--accent) !important;
+    font-weight: 600 !important;
+}
+
+#user-tools {
+    font-family: var(--font-body) !important;
+    font-size: 11px !important;
+    letter-spacing: 1.5px !important;
+    color: #A0A0A0 !important;
+    text-transform: uppercase !important;
+}
+
+#user-tools a {
+    color: var(--accent) !important;
+    font-weight: 600 !important;
+    margin-left: 10px !important;
+}
+
+#user-tools a:hover {
+    color: var(--accent-hover) !important;
+    text-decoration: underline !important;
+}
+
+/* ==========================================
+   BREADCRUMBS
+========================================== */
+
+div.breadcrumbs {
+    background: #FFFFFF !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    padding: 12px 36px !important;
+    font-family: var(--font-body) !important;
+    font-size: 12px !important;
+    letter-spacing: 1px !important;
+    color: #888888 !important;
+}
+
+div.breadcrumbs a {
+    color: #111111 !important;
+    font-weight: 600 !important;
+}
+
+/* ==========================================
+   MAIN DASHBOARD LAYOUT & ARRANGEMENT
+========================================== */
+
+/* Hide duplicate left drawer sidebar on main dashboard index */
+.dashboard #nav-sidebar,
+.dashboard .toggle-nav-sidebar {
+    display: none !important;
+}
+
+.dashboard #main {
+    margin-left: 0 !important;
+    width: 100% !important;
+}
+
+#content {
+    padding: 36px 40px !important;
+    background: var(--body-bg) !important;
+    max-width: 1440px !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+}
+
+.dashboard-welcome h1 {
+    font-family: var(--font-heading) !important;
+    font-size: 36px !important;
+    font-weight: 500 !important;
+    color: #111111 !important;
+    margin-top: 0 !important;
+    margin-bottom: 32px !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* Flexbox Dashboard Grid */
+.dashboard-container {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    gap: 36px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.dashboard #content-main {
+    flex: 1 1 68% !important;
+    width: auto !important;
+    float: none !important;
+    margin: 0 !important;
+}
+
+.dashboard #content-related {
+    flex: 0 0 340px !important;
+    width: 340px !important;
+    float: none !important;
+    margin: 0 !important;
+    background: #FFFFFF !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    padding: 28px !important;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.03) !important;
+    box-sizing: border-box !important;
+}
+
+/* ==========================================
+   APP MODULE CARDS (#content-main)
+========================================== */
+
+.dashboard .module {
+    background: #FFFFFF !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.03) !important;
+    margin-bottom: 32px !important;
+    overflow: hidden !important;
+}
+
+.dashboard .module table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    table-layout: auto !important;
+}
+
+.dashboard .module caption, 
+.dashboard .module h2 {
+    background: #111111 !important;
+    color: #FFFFFF !important;
+    font-family: var(--font-heading) !important;
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+    padding: 16px 28px !important;
+    margin: 0 !important;
+    text-align: left !important;
+    border-left: 4px solid var(--accent) !important;
+    white-space: nowrap !important;
+    word-break: normal !important;
+}
+
+.dashboard .module caption a,
+.dashboard .module h2 a {
+    color: #FFFFFF !important;
+    white-space: nowrap !important;
+}
+
+/* Table rows inside app modules */
+.dashboard .module tr {
+    background: #FFFFFF !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    transition: background 0.2s ease !important;
+}
+
+.dashboard .module tr:last-child {
+    border-bottom: none !important;
+}
+
+.dashboard .module tr:hover {
+    background: var(--accent-light) !important;
+}
+
+.dashboard .module th {
+    padding: 16px 24px !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+    word-break: normal !important;
+    min-width: 180px !important;
+}
+
+.dashboard .module td {
+    padding: 16px 24px !important;
+    vertical-align: middle !important;
+    text-align: right !important;
+    white-space: nowrap !important;
+}
+
+/* Model Title Link */
+.dashboard .module th a {
+    font-family: var(--font-body) !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: #111111 !important;
+    letter-spacing: 0.5px !important;
+    white-space: nowrap !important;
+    word-break: normal !important;
+    display: inline-block !important;
+}
+
+.dashboard .module th a:hover {
+    color: var(--accent) !important;
+}
+
+/* Add / Change Buttons in Table Rows */
+.dashboard .module td a.addlink,
+.dashboard .module td a.changelink,
+.dashboard .module td a.viewlink {
+    font-family: var(--font-body) !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+    padding: 6px 16px !important;
+    border-radius: 20px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    transition: all 0.2s ease !important;
+    white-space: nowrap !important;
+}
+
+.dashboard .module td a.addlink {
+    background: #111111 !important;
+    color: #FFFFFF !important;
+    border: 1px solid #111111 !important;
+}
+
+.dashboard .module td a.addlink:hover {
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+    color: #FFFFFF !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 3px 10px rgba(184, 149, 90, 0.3) !important;
+}
+
+.dashboard .module td a.changelink {
+    background: transparent !important;
+    color: #555555 !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.dashboard .module td a.changelink:hover {
+    background: #111111 !important;
+    color: #FFFFFF !important;
+    border-color: #111111 !important;
+}
+
+/* ==========================================
+   RECENT ACTIONS SIDEBAR (#content-related)
+========================================== */
+
+#content-related h2, 
+#content-related h3 {
+    font-family: var(--font-heading) !important;
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    color: #111111 !important;
+    letter-spacing: 1px !important;
+    margin-top: 0 !important;
+    margin-bottom: 20px !important;
+    padding-bottom: 12px !important;
+    border-bottom: 2px solid var(--accent) !important;
+    background: transparent !important;
+    white-space: nowrap !important;
+    word-break: normal !important;
+    text-transform: uppercase !important;
+}
+
+#content-related .module {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+#content-related ul.actionlist {
+    padding: 0 !important;
+    margin: 0 !important;
+    list-style: none !important;
+}
+
+#content-related ul.actionlist li {
+    padding: 12px 0 !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    font-family: var(--font-body) !important;
+    font-size: 13px !important;
+    color: var(--text-muted) !important;
+    line-height: 1.6 !important;
+}
+
+#content-related ul.actionlist li:last-child {
+    border-bottom: none !important;
+}
+
+#content-related ul.actionlist li a {
+    color: #111111 !important;
+    font-weight: 600 !important;
+}
+
+#content-related ul.actionlist li a:hover {
+    color: var(--accent) !important;
+}
+
+#content-related .mini {
+    font-size: 11px !important;
+    color: #888888 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* Action Badges in Recent Activity */
+#content-related span.mini {
+    background: var(--accent-light) !important;
+    color: var(--accent) !important;
+    padding: 2px 8px !important;
+    border-radius: 4px !important;
+    font-weight: 600 !important;
+}
+
+/* ==========================================
+   MODEL LIST VIEW & FORMS (#result_list)
+========================================== */
+
+#result_list {
+    width: 100% !important;
+    background: #FFFFFF !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+#result_list th {
+    background: #F5F4F0 !important;
+    color: #111111 !important;
+    font-family: var(--font-body) !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1.5px !important;
+    text-transform: uppercase !important;
+    padding: 16px 20px !important;
+    border-bottom: 2px solid var(--border-color) !important;
+}
+
+#result_list tr:nth-child(odd) {
+    background: #FFFFFF !important;
+}
+
+#result_list tr:nth-child(even) {
+    background: #FAF9F6 !important;
+}
+
+#result_list tr:hover {
+    background: var(--accent-light) !important;
+}
+
+#result_list td {
+    padding: 16px 20px !important;
+    font-size: 14px !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+/* Search bar */
+#toolbar, #changelist-search {
+    background: #FFFFFF !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 10px !important;
+    padding: 16px 24px !important;
+    margin-bottom: 24px !important;
+}
+
+/* Buttons */
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+    background: #111111 !important;
+    color: #FFFFFF !important;
+    border: 1px solid #111111 !important;
+    border-radius: 30px !important;
+    padding: 10px 24px !important;
+    font-family: var(--font-body) !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    letter-spacing: 1.5px !important;
+    text-transform: uppercase !important;
+    cursor: pointer !important;
+    transition: all 0.25s ease !important;
+}
+
+.button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover {
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 14px rgba(184, 149, 90, 0.35) !important;
+}
+
+/* Forms */
+form .form-row {
+    padding: 18px 24px !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+input[type=text], input[type=password], input[type=email], input[type=url], 
+input[type=number], input[type=tel], textarea, select {
+    border: 1px solid var(--border-color) !important;
+    border-radius: 6px !important;
+    padding: 10px 14px !important;
+    font-family: var(--font-body) !important;
+    font-size: 14px !important;
+    background: #FFFFFF !important;
+    color: #111111 !important;
+}
+
+input[type=text]:focus, textarea:focus, select:focus {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px rgba(184, 149, 90, 0.2) !important;
+    outline: none !important;
+}
+
+/* ==========================================
+   RESPONSIVE MEDIA QUERIES FOR ADMIN THEME
+========================================== */
+
+/* Laptop & Tablet  ≤1024px */
+@media (max-width: 1024px) {
+
+    #header {
+        padding: 12px 20px !important;
+        flex-wrap: wrap !important;
+        gap: 12px !important;
+    }
+
+    .admin-logo-img {
+        height: 32px !important;
+    }
+
+    .admin-brand-tag {
+        font-size: 9px !important;
+        letter-spacing: 2px !important;
+        padding-left: 10px !important;
+    }
+
+    #user-tools {
+        font-size: 10px !important;
+    }
+
+    #content {
+        padding: 24px 20px !important;
+    }
+
+    .dashboard #content-main {
+        float: none !important;
+        width: 100% !important;
+        margin-bottom: 24px !important;
+    }
+
+    .dashboard #content-related {
+        float: none !important;
+        width: 100% !important;
+    }
+
+    #changelist {
+        flex-direction: column !important;
+    }
+
+    #changelist-filter {
+        width: 100% !important;
+        margin-top: 20px !important;
+    }
+
+}
+
+/* Large Mobile  ≤768px */
+@media (max-width: 768px) {
+
+    #header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+
+    #user-tools {
+        width: 100% !important;
+        margin-top: 4px !important;
+    }
+
+    div.breadcrumbs {
+        padding: 10px 20px !important;
+        font-size: 11px !important;
+    }
+
+    #content h1 {
+        font-size: 26px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .dashboard .module th, 
+    .dashboard .module td {
+        padding: 12px 16px !important;
+    }
+
+    .dashboard .module td {
+        display: flex !important;
+        justify-content: flex-end !important;
+        gap: 8px !important;
+    }
+
+    /* Make table horizontally scrollable */
+    #result_list {
+        display: block !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+    }
+
+    #changelist-search input[type=text] {
+        min-width: 100% !important;
+        box-sizing: border-box !important;
+        margin-bottom: 10px !important;
+    }
+
+    #changelist-search input[type=submit] {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .submit-row {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+
+    .submit-row input, .submit-row a {
+        width: 100% !important;
+        text-align: center !important;
+        box-sizing: border-box !important;
+    }
+
+}
+
+/* Small Mobile  ≤480px */
+@media (max-width: 480px) {
+
+    #content {
+        padding: 16px 12px !important;
+    }
+
+    .admin-logo-img {
+        height: 28px !important;
+    }
+
+    .admin-brand-tag {
+        display: none !important;
+    }
+
+    .dashboard .module caption, 
+    .dashboard .module h2 {
+        font-size: 16px !important;
+        padding: 10px 16px !important;
+    }
+
+    .dashboard .module th a {
+        font-size: 13px !important;
+    }
+
+    .dashboard .module td a.addlink, 
+    .dashboard .module td a.changelink {
+        padding: 4px 10px !important;
+        font-size: 10px !important;
+    }
+
+}

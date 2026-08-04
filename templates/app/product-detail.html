@@ -37,7 +37,7 @@
                 <div class="product-image-wrapper">
 
                     <img
-                        src="{% static product.image %}"
+                        src="{{ product.image.url }}"
                         alt="{{ product.name }}">
 
                 </div>
@@ -71,7 +71,7 @@
 
                 <div class="product-price">
 
-                    {{ product.price }}
+                    ₹ {{ product.price }}
 
                 </div>
 
@@ -98,7 +98,7 @@
 
     data-price="{{ product.price }}"
 
-    data-image="{% static product.image %}"
+    data-image="{{ product.image.url }}"
 
     data-slug="{{ product.slug }}">
 
@@ -108,7 +108,11 @@
 
 </button>
 
-                    <button class="btn-secondary">
+                    <button class="btn-secondary wishlist-detail-btn"
+                        data-name="{{ product.name }}"
+                        data-price="{{ product.price }}"
+                        data-image="{{ product.image.url }}"
+                        data-slug="{{ product.slug }}">
 
                         <i class="fa-regular fa-heart"></i>
 
@@ -198,11 +202,11 @@
 
                 <p>
 
-                    Bergamot
-                    <br>
-                    Pink Pepper
-                    <br>
-                    Cardamom
+                    {% if product.top_notes %}
+                        {{ product.top_notes }}
+                    {% else %}
+                        —
+                    {% endif %}
 
                 </p>
 
@@ -220,11 +224,11 @@
 
                 <p>
 
-                    Cedarwood
-                    <br>
-                    Iris
-                    <br>
-                    Patchouli
+                    {% if product.heart_notes %}
+                        {{ product.heart_notes }}
+                    {% else %}
+                        —
+                    {% endif %}
 
                 </p>
 
@@ -242,11 +246,11 @@
 
                 <p>
 
-                    Amber
-                    <br>
-                    Sandalwood
-                    <br>
-                    Musk
+                    {% if product.base_notes %}
+                        {{ product.base_notes }}
+                    {% else %}
+                        —
+                    {% endif %}
 
                 </p>
 
@@ -413,6 +417,172 @@
                     Carefully packed and shipped with secure nationwide delivery.
 
                 </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!--==========================================
+        CUSTOMER REVIEWS & RATING
+===========================================-->
+
+<section class="product-reviews-section">
+
+    <div class="container-custom">
+
+        <div class="reviews-header">
+
+            <span>Client Experiences</span>
+
+            <h2>Customer Reviews</h2>
+
+            <div class="rating-summary">
+
+                <div class="rating-number">{{ product.get_average_rating }}</div>
+
+                <div class="rating-stars">
+
+                    <i class="fa-solid fa-star"></i>
+
+                    <i class="fa-solid fa-star"></i>
+
+                    <i class="fa-solid fa-star"></i>
+
+                    <i class="fa-solid fa-star"></i>
+
+                    <i class="fa-solid fa-star"></i>
+
+                </div>
+
+                <span class="review-count">Based on {{ product.get_review_count }} Review{{ product.get_review_count|pluralize }}</span>
+
+            </div>
+
+        </div>
+
+        <div class="reviews-grid">
+
+            <!-- Review Cards List -->
+
+            <div class="reviews-list">
+
+                {% if reviews %}
+
+                    {% for review in reviews %}
+
+                    <div class="review-card">
+
+                        <div class="review-card-header">
+
+                            <div class="reviewer-meta">
+
+                                <h4>{{ review.reviewer_name }}</h4>
+
+                                {% if review.verified_purchase %}
+
+                                <span class="badge-verified"><i class="fa-solid fa-circle-check"></i> Verified Purchase</span>
+
+                                {% endif %}
+
+                            </div>
+
+                            <span class="review-date">{{ review.created_at|date:"d M Y" }}</span>
+
+                        </div>
+
+                        <div class="review-card-rating">
+
+                            {% for i in "12345" %}
+
+                                {% if forloop.counter <= review.rating %}
+
+                                <i class="fa-solid fa-star"></i>
+
+                                {% else %}
+
+                                <i class="fa-regular fa-star"></i>
+
+                                {% endif %}
+
+                            {% endfor %}
+
+                        </div>
+
+                        {% if review.headline %}
+
+                        <h5 class="review-headline">{{ review.headline }}</h5>
+
+                        {% endif %}
+
+                        <p class="review-comment">{{ review.comment }}</p>
+
+                    </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty-reviews">
+
+                        <i class="fa-regular fa-message"></i>
+
+                        <p>Be the first to review <strong>{{ product.name }}</strong>.</p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+            <!-- Submit Review Form -->
+
+            <div class="review-form-card">
+
+                <h3>Write a Review</h3>
+
+                <form method="POST" action="{% url 'add-review' product.slug %}">
+
+                    {% csrf_token %}
+
+                    <input type="text" name="reviewer_name" placeholder="Your Name" value="{% if request.user.is_authenticated %}{{ request.user.get_full_name|default:request.user.username }}{% endif %}" required>
+
+                    <input type="email" name="reviewer_email" placeholder="Your Email" value="{% if request.user.is_authenticated %}{{ request.user.email }}{% endif %}" required>
+
+                    <div class="form-group">
+
+                        <label>Rating</label>
+
+                        <select name="rating" required>
+
+                            <option value="5">5 Stars — Excellent</option>
+
+                            <option value="4">4 Stars — Very Good</option>
+
+                            <option value="3">3 Stars — Average</option>
+
+                            <option value="2">2 Stars — Poor</option>
+
+                            <option value="1">1 Star — Terrible</option>
+
+                        </select>
+
+                    </div>
+
+                    <input type="text" name="headline" placeholder="Review Title (e.g. Majestic scent)">
+
+                    <textarea name="comment" rows="4" placeholder="Share details about longevity, sillage, and scent experience..." required></textarea>
+
+                    <button type="submit" class="btn-primary">
+
+                        Submit Review
+
+                    </button>
+
+                </form>
 
             </div>
 

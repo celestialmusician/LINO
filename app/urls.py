@@ -34,6 +34,12 @@ urlpatterns = [
     ),
 
     path(
+        'product/<slug:slug>/add-review/',
+        views.AddReviewView.as_view(),
+        name='add-review'
+    ),
+
+    path(
         "wishlist/",
         views.WishlistView.as_view(),
         name="wishlist",
@@ -49,31 +55,42 @@ urlpatterns = [
         "checkout/",
         views.CheckoutView.as_view(),
         name="checkout",
-),
-
-    path("order-success/",
-         views.OrderSuccessView.as_view(), name="order_success",
-),
-
-    path("profile/",
-        views.ProfileView.as_view(),
-        name="profile",
-),
-
-    path("login/",
-        views.LoginView.as_view(),
-        name="login",
-),
-
-    path("register/",
-        views.RegisterView.as_view(),
-        name="register",
-),
+    ),
 
     path(
-    "my-orders/",
-    views.MyOrdersView.as_view(),
-    name="my_orders",
-),
+        "order-success/",
+        views.OrderSuccessView.as_view(),
+        name="order_success",
+    ),
+
+    path(
+        "profile/",
+        views.ProfileView.as_view(),
+        name="profile",
+    ),
+
+    path(
+        "login/",
+        views.LoginView.as_view(),
+        name="login",
+    ),
+
+    path(
+        "register/",
+        views.RegisterView.as_view(),
+        name="register",
+    ),
+
+    path(
+        "logout/",
+        views.LogoutView.as_view(),
+        name="logout",
+    ),
+
+    path(
+        "my-orders/",
+        views.MyOrdersView.as_view(),
+        name="my_orders",
+    ),
 
 ]

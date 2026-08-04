@@ -1,6 +1,8 @@
 {% extends 'app/base.html' %}
 {% load static %}
 
+{% block title %}My Profile | LINO{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/profile.css' %}">
 {% endblock %}
@@ -20,52 +22,34 @@
                     alt="Profile">
 
                 <h2 id="userName">
-                    Aswin S Arun
+                    {{ request.user.get_full_name|default:request.user.username }}
                 </h2>
 
                 <p id="userEmail">
-                    aswin@gmail.com
+                    {{ request.user.email }}
                 </p>
 
             </div>
 
             <div class="profile-menu">
 
-                <a href="#">
-                    <span>📦</span>
+                <a href="{% url 'my_orders' %}">
+                    <span><i class="fa-solid fa-box"></i></span>
                     My Orders
                 </a>
 
-                <a href="#">
-                    <span>❤️</span>
+                <a href="{% url 'wishlist' %}">
+                    <span><i class="fa-regular fa-heart"></i></span>
                     Wishlist
                 </a>
 
-                <a href="#">
-                    <span>📍</span>
-                    Saved Addresses
+                <a href="{% url 'collections' %}">
+                    <span><i class="fa-solid fa-spray-can-sparkles"></i></span>
+                    Shop Now
                 </a>
 
-                <a href="{% url 'my_orders' %}"      class="profile-card">
-
-                    <i class="fa-solid fa-box"></i>
-
-                    <span>My Orders</span>
-
-                </a>
-
-                <a href="#">
-                    <span>⚙️</span>
-                    Account Settings
-                </a>
-
-                <a href="#">
-                    <span>🔐</span>
-                    Change Password
-                </a>
-
-                <a href="#" id="logoutBtn">
-                    <span>🚪</span>
+                <a href="{% url 'logout' %}" id="logoutBtn">
+                    <span><i class="fa-solid fa-right-from-bracket"></i></span>
                     Logout
                 </a>
 
@@ -99,7 +83,7 @@
 
                     <h3>Orders</h3>
 
-                    <h2>08</h2>
+                    <h2>{{ order_count }}</h2>
 
                     <p>Total Purchases</p>
 
@@ -109,7 +93,7 @@
 
                     <h3>Wishlist</h3>
 
-                    <h2>15</h2>
+                    <h2 id="profileWishlistCount">—</h2>
 
                     <p>Saved Perfumes</p>
 
@@ -117,21 +101,21 @@
 
                 <div class="dash-box">
 
-                    <h3>Addresses</h3>
+                    <h3>Member Since</h3>
 
-                    <h2>02</h2>
+                    <h2>{{ request.user.date_joined|date:"Y" }}</h2>
 
-                    <p>Saved Locations</p>
+                    <p>Loyal Customer</p>
 
                 </div>
 
                 <div class="dash-box">
 
-                    <h3>Member</h3>
+                    <h3>Status</h3>
 
                     <h2>Gold</h2>
 
-                    <p>Loyal Customer</p>
+                    <p>Premium Member</p>
 
                 </div>
 
@@ -143,6 +127,13 @@
 
 </section>
 
-<script src="{% static 'js/profile.js' %}"></script>
+<script>
+    // Update wishlist count from localStorage on the profile page
+    document.addEventListener("DOMContentLoaded", function () {
+        const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+        const el = document.getElementById("profileWishlistCount");
+        if (el) el.textContent = wishlist.length;
+    });
+</script>
 
 {% endblock %}

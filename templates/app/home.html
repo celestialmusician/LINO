@@ -630,37 +630,49 @@ LINO | FRAGRANCE OF HEAVEN
 
         <div class="products-grid">
 
-            <!-- Product Card 1 -->
+            {% for product in featured_products %}
 
-            <article class="product-card">
+            <article class="product-card quick-view-btn"
+                data-name="{{ product.name }}"
+                data-price="₹ {{ product.price }}"
+                data-subtitle="{{ product.subtitle }}"
+                data-image="{{ product.image.url }}"
+                data-slug="{{ product.slug }}"
+                data-link="{% url 'product-detail' product.slug %}">
+
+                <div class="product-wishlist">
+
+                    <i class="fa-regular fa-heart"></i>
+
+                </div>
 
                 <div class="product-image">
 
-                    <img src="{% static 'images/products/ONE MILLION.png' %}"
+                    <img src="{{ product.image.url }}"
 
-                         alt="ONE MILLION">
+                         alt="{{ product.name }}">
 
                 </div>
 
                 <span class="product-category">
 
-                    Eau De Parfum
+                    {{ product.concentration }}
 
                 </span>
 
                 <h3>
 
-                    ONE MILLION
+                    {{ product.name }}
 
                 </h3>
 
                 <p class="product-price">
 
-                    ₹3,999
+                    ₹ {{ product.price }}
 
                 </p>
 
-                <a href="#" class="btn-luxury">
+                <a href="{% url 'product-detail' product.slug %}" class="btn-luxury">
 
                     <span>
 
@@ -673,6 +685,16 @@ LINO | FRAGRANCE OF HEAVEN
                 </a>
 
             </article>
+
+            {% empty %}
+
+            <div class="empty-featured">
+
+                <p>Coming soon — our finest fragrances.</p>
+
+            </div>
+
+            {% endfor %}
 
         </div>
 

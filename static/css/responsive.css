@@ -1,168 +1,687 @@
 /*==================================================
-                LINO
-            GLOBAL RESPONSIVE
+    LINO – GLOBAL RESPONSIVE OVERHAUL
+    Covers: Container · Variables · Hero · Collections
+            Product Detail · Checkout · Cart
+            Login · Register · Profile · Footer
+            Navbar · Buttons · Typography
 ==================================================*/
 
 
 /*==========================================
-            LARGE DESKTOP
+    BASE – Fluid Section Padding Variable
 ==========================================*/
 
-@media (max-width:1400px){
+:root {
+    --section-padding: clamp(64px, 10vw, 140px);
+    --section-padding-large: clamp(80px, 12vw, 180px);
+}
 
-    .container-custom{
 
-        max-width:1200px;
+/*==========================================
+            LARGE DESKTOP  ≤1400px
+==========================================*/
 
-        padding-inline:32px;
+@media (max-width: 1400px) {
 
+    .container-custom {
+        max-width: 1200px;
+        padding-inline: 32px;
     }
 
 }
 
 
 /*==========================================
-                LAPTOP
+                LAPTOP  ≤1200px
 ==========================================*/
 
-@media (max-width:1200px){
+@media (max-width: 1200px) {
 
-    .container-custom{
+    .container-custom {
+        padding-inline: 28px;
+    }
 
-        padding-inline:28px;
+    /* Product detail – narrow gap */
+    .product-grid {
+        gap: 60px;
+    }
 
+    /* Collections hero */
+    .collections-hero {
+        padding: 160px 0 90px;
     }
 
 }
 
 
 /*==========================================
-                TABLET
+                TABLET  ≤992px
 ==========================================*/
 
-@media (max-width:992px){
+@media (max-width: 992px) {
 
-    html{
-
-        font-size:95%;
-
+    html {
+        font-size: 95%;
     }
 
-    .container-custom{
+    .container-custom {
+        padding-inline: 24px;
+    }
 
-        padding-inline:24px;
+    /* ---- Hero ---- */
+    .hero {
+        padding: 120px 0 80px;
+        min-height: auto;
+    }
 
+    .hero-wrapper {
+        grid-template-columns: 1fr;
+        gap: 60px;
+        text-align: center;
+    }
+
+    .hero-content {
+        max-width: 680px;
+        margin-inline: auto;
+    }
+
+    .hero-description {
+        margin-inline: auto;
+    }
+
+    .hero-buttons {
+        justify-content: center;
+    }
+
+    .hero-media {
+        order: -1;
+    }
+
+    .hero-image {
+        max-width: 340px;
+    }
+
+    .hero-scroll {
+        display: none;
+    }
+
+    /* ---- Product Detail ---- */
+    .product-hero {
+        padding: 130px 0 80px;
+        min-height: auto;
+    }
+
+    .product-grid {
+        grid-template-columns: 1fr;
+        gap: 48px;
+        text-align: center;
+    }
+
+    .product-image-wrapper {
+        max-width: 360px;
+        margin-inline: auto;
+    }
+
+    .product-content-column {
+        max-width: 100%;
+    }
+
+    .product-buttons {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .product-features {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* ---- Collections ---- */
+    .collections-hero {
+        padding: 130px 0 70px;
+    }
+
+    .collections-grid-inner,
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* ---- Notes ---- */
+    .notes-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+    }
+
+    /* ---- Assurance ---- */
+    .assurance-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* ---- Story ---- */
+    .story-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    /* ---- Brand ---- */
+    .brand-wrapper {
+        grid-template-columns: 1fr;
+        gap: 48px;
+    }
+
+    /* ---- Checkout ---- */
+    .checkout-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-card {
+        position: static;
+    }
+
+    /* ---- Profile ---- */
+    .profile-container {
+        grid-template-columns: 1fr;
     }
 
 }
 
 
 /*==========================================
-            LARGE MOBILE
+            LARGE MOBILE  ≤768px
 ==========================================*/
 
-@media (max-width:768px){
+@media (max-width: 768px) {
 
-    html{
-
-        font-size:92.5%;
-
-        overflow-x:hidden;
-
+    html {
+        font-size: 92.5%;
+        overflow-x: hidden;
     }
 
-    body{
-
-        overflow-x:hidden;
-
+    body {
+        overflow-x: hidden;
     }
 
-    .container-custom{
-
-        padding-inline:20px;
-
+    .container-custom {
+        padding-inline: 20px;
     }
 
-    section{
-
-        overflow:hidden;
-
+    section {
+        overflow: hidden;
     }
 
-    img,
-    video{
-
-        max-width:100%;
-
-        height:auto;
-
+    img, video {
+        max-width: 100%;
+        height: auto;
     }
 
-    table{
+    table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+    }
 
-        display:block;
+    /* ---- Hero ---- */
+    .hero {
+        padding: 100px 0 60px;
+    }
 
-        width:100%;
+    .hero-title {
+        font-size: clamp(52px, 13vw, 80px);
+        letter-spacing: -1px;
+    }
 
-        overflow-x:auto;
+    .hero-description {
+        font-size: 16px;
+    }
 
+    .hero-image {
+        max-width: 260px;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+    }
+
+    /* ---- Product Detail ---- */
+    .product-hero {
+        padding: 100px 0 60px;
+    }
+
+    .product-title {
+        font-size: clamp(2rem, 7vw, 3rem);
+    }
+
+    .product-image-wrapper {
+        max-width: 280px;
+    }
+
+    .product-features {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .product-buttons {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .product-buttons .btn-primary,
+    .product-buttons .btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* ---- Notes ---- */
+    .notes-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    /* ---- Assurance ---- */
+    .assurance-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    /* ---- Collections ---- */
+    .collections-hero {
+        padding: 110px 0 60px;
+    }
+
+    .collections-title {
+        font-size: clamp(2.4rem, 10vw, 4rem);
+    }
+
+    .collections-grid .container-custom {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .collection-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+        padding-inline: 20px;
+    }
+
+    .toolbar-right {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    /* ---- Login / Register ---- */
+    .login-container,
+    .register-container {
+        grid-template-columns: 1fr;
+        max-width: 480px;
+        margin-inline: auto;
+    }
+
+    .login-right,
+    .register-left {
+        display: none;
+    }
+
+    .login-left,
+    .register-right {
+        padding: 40px 28px;
+    }
+
+    /* ---- Profile ---- */
+    .profile-section {
+        padding: 100px 0 60px;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* ---- Checkout ---- */
+    .checkout-page {
+        padding: 110px 16px 60px;
+    }
+
+    .checkout-header h1 {
+        font-size: clamp(1.8rem, 7vw, 2.8rem);
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .checkout-card {
+        padding: 24px 20px;
+        border-radius: 12px;
+    }
+
+    /* ---- My Orders ---- */
+    .orders-page {
+        padding: 110px 20px 60px;
+    }
+
+    .order-card {
+        padding: 20px;
+    }
+
+    .order-footer {
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    /* ---- Cart ---- */
+    .cart-section {
+        padding: 110px 0 60px;
+    }
+
+    .cart-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* ---- Footer ---- */
+    .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 36px;
+    }
+
+    /* ---- Brand Section ---- */
+    .brand-image-col {
+        max-height: 340px;
+        overflow: hidden;
+    }
+
+    /* ---- Story ---- */
+    .story-section {
+        padding: 60px 0;
+    }
+
+    /* ---- Section headings ---- */
+    .section-title {
+        font-size: clamp(2rem, 8vw, 3.5rem);
     }
 
 }
 
 
 /*==========================================
-            SMALL MOBILE
+            SMALL MOBILE  ≤576px
 ==========================================*/
 
-@media (max-width:576px){
+@media (max-width: 576px) {
 
-    html{
-
-        font-size:90%;
-
+    html {
+        font-size: 90%;
     }
 
-    .container-custom{
+    .container-custom {
+        padding-inline: 18px;
+    }
 
-        padding-inline:18px;
+    /* ---- Hero ---- */
+    .hero {
+        padding: 90px 0 50px;
+    }
 
+    .hero-title {
+        font-size: clamp(44px, 12vw, 66px);
+    }
+
+    /* ---- Products grid → 1 column ---- */
+    .products-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    /* Product card horizontal on mobile */
+    .product-card {
+        flex-direction: row;
+        align-items: center;
+        text-align: left;
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .product-card .product-image {
+        width: 90px;
+        height: 110px;
+        flex-shrink: 0;
+        margin-bottom: 0;
+    }
+
+    .product-card .btn-luxury {
+        display: none;
+    }
+
+    /* ---- Collections still 2 cols ---- */
+    .collections-grid .container-custom {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    /* ---- Notes ---- */
+    .notes-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* ---- Assurance ---- */
+    .assurance-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* ---- Footer ---- */
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 28px;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 14px;
+        text-align: center;
+    }
+
+    /* ---- Dashboard ---- */
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* ---- Profile menu ---- */
+    .profile-menu {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    /* ---- Checkout ---- */
+    .checkout-page {
+        padding: 100px 14px 50px;
+    }
+
+    /* ---- Success card ---- */
+    .success-card {
+        padding: 40px 24px;
+    }
+
+    .success-card h1 {
+        font-size: clamp(1.6rem, 7vw, 2.2rem);
+    }
+
+    /* ---- Login ---- */
+    .login-left,
+    .register-right {
+        padding: 32px 20px;
     }
 
 }
 
 
 /*==========================================
-            EXTRA SMALL MOBILE
+            EXTRA SMALL  ≤480px
 ==========================================*/
 
-@media (max-width:480px){
+@media (max-width: 480px) {
 
-    .container-custom{
+    .container-custom {
+        padding-inline: 16px;
+    }
 
-        padding-inline:16px;
+    .hero-title {
+        font-size: clamp(40px, 11vw, 56px);
+    }
 
+    /* ---- Collections: 2 col on small ---- */
+    .collections-grid .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .product-card h3 {
+        font-size: 0.9rem;
+    }
+
+    .product-card span {
+        font-size: 0.85rem;
+    }
+
+    /* ---- Toolbar ---- */
+    .collection-toolbar {
+        padding-inline: 16px;
+    }
+
+    /* ---- Product detail buttons ---- */
+    .product-buttons {
+        flex-direction: column;
+    }
+
+    .product-buttons .btn-primary,
+    .product-buttons .btn-secondary {
+        width: 100%;
+        justify-content: center;
+        font-size: 0.85rem;
     }
 
 }
 
 
 /*==========================================
-            VERY SMALL DEVICES
+            VERY SMALL  ≤360px
 ==========================================*/
 
-@media (max-width:360px){
+@media (max-width: 360px) {
 
-    html{
-
-        font-size:87.5%;
-
+    html {
+        font-size: 87.5%;
     }
 
-    .container-custom{
+    .container-custom {
+        padding-inline: 14px;
+    }
 
-        padding-inline:14px;
+    .hero-title {
+        font-size: clamp(36px, 10vw, 48px);
+        letter-spacing: -0.5px;
+    }
 
+    .hero-buttons {
+        gap: 12px;
+    }
+
+    /* Collections: 1 col on very small */
+    .collections-grid .products-grid,
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .product-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .product-card .product-image {
+        width: 160px;
+        height: 180px;
+        margin-bottom: 1rem;
+    }
+
+    .product-card .btn-luxury {
+        display: flex;
+    }
+
+}
+
+
+/*==========================================
+    UTILITY — Touch device overrides
+==========================================*/
+
+@media (hover: none) and (pointer: coarse) {
+
+    /* Enlarge tap targets */
+    .nav-link,
+    .menu-toggle,
+    .btn-primary,
+    .btn-secondary,
+    .checkout-btn {
+        min-height: 48px;
+    }
+
+    /* Disable hover-only effects */
+    .product-card:hover {
+        transform: none;
+    }
+
+    .product-card:hover .product-image img {
+        transform: none;
+    }
+
+    /* Disable custom cursor on touch */
+    .cursor-dot,
+    .cursor-ring {
+        display: none !important;
+    }
+
+    * {
+        cursor: auto !important;
+    }
+
+}
+
+
+/*==========================================
+    UTILITY — Safe area (notch devices)
+==========================================*/
+
+@supports (padding: env(safe-area-inset-bottom)) {
+
+    .navbar {
+        padding-left:  env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+
+    .mobile-menu {
+        padding-bottom: calc(40px + env(safe-area-inset-bottom));
+    }
+
+}
+
+
+/*==========================================
+    UTILITY — Print
+==========================================*/
+
+@media print {
+
+    .navbar,
+    .footer,
+    .hero-scroll,
+    .cursor-dot,
+    .cursor-ring,
+    .mobile-menu,
+    .mobile-menu-overlay {
+        display: none !important;
     }
 
 }
