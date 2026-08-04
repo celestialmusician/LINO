@@ -1,17 +1,18 @@
 /*==================================================
-            LINO PRELOADER
+        LINO PRELOADER - MINIMAL GLASSMORPHISM
 ==================================================*/
 
 #preloader{
     position:fixed;
     inset:0;
-    background:#ffffff;
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(18px) saturate(180%);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
     display:flex;
     justify-content:center;
     align-items:center;
     z-index:99999;
-    transition:opacity .8s cubic-bezier(0.16, 1, 0.3, 1),
-               visibility .8s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.6s ease, visibility 0.6s ease;
 }
 
 .preloader-wrapper{
@@ -22,71 +23,55 @@
 }
 
 /*==========================================
-            EXACT WEBSITE LOGO
+        MINIMAL LOGO
 ==========================================*/
 
 .preloader-logo-container{
-    margin-bottom:20px;
+    margin-bottom:14px;
     display:flex;
     justify-content:center;
     align-items:center;
 }
 
 .preloader-logo-img{
-    height:75px;
+    height:42px;
     width:auto;
-    max-width:260px;
+    max-width:180px;
     object-fit:contain;
-    animation:logoShimmer 2s ease-in-out infinite alternate, logoPopIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-    filter: drop-shadow(0 4px 12px rgba(212, 175, 55, 0.15));
+    animation: minimalPulse 1.8s ease-in-out infinite alternate;
 }
 
-@keyframes logoPopIn {
+@keyframes minimalPulse {
     0% {
-        opacity:0;
-        transform:scale(0.88);
+        opacity:0.75;
     }
     100% {
         opacity:1;
-        transform:scale(1);
-    }
-}
-
-@keyframes logoShimmer {
-    0% {
-        opacity:0.85;
-        transform:scale(1);
-        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.05));
-    }
-    100% {
-        opacity:1;
-        transform:scale(1.04);
-        filter: drop-shadow(0 6px 20px rgba(212, 175, 55, 0.3));
     }
 }
 
 /*==========================================
-            TAGLINE
+        TAGLINE
 ==========================================*/
 
 .preloader-text{
-    font-size:12px;
-    letter-spacing:6px;
+    font-size:10px;
+    letter-spacing:5px;
     text-transform:uppercase;
-    color:#666666;
-    margin-bottom:30px;
+    color:#777777;
+    margin-bottom:22px;
     font-weight:400;
 }
 
 /*==========================================
-            LUXURY GOLDEN PROGRESS LINE
+        MINIMAL THIN LINE
 ==========================================*/
 
 .preloader-line{
-    width:180px;
-    height:3px;
-    background:#f0ede6;
-    border-radius:3px;
+    width:120px;
+    height:1.5px;
+    background:rgba(0, 0, 0, 0.06);
+    border-radius:2px;
     overflow:hidden;
     margin:auto;
 }
@@ -95,8 +80,8 @@
     display:block;
     width:0%;
     height:100%;
-    background:linear-gradient(90deg, #111111 0%, #D4AF37 50%, #111111 100%);
-    animation:loading 1.6s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+    background:#D4AF37;
+    animation:loading 1.4s ease-out forwards;
 }
 
 @keyframes loading{
@@ -109,22 +94,23 @@
 }
 
 /*==========================================
-                RESPONSIVE
+            RESPONSIVE
 ==========================================*/
 
 @media (max-width:576px){
     .preloader-logo-img{
-        height:55px;
-        max-width:200px;
+        height:34px;
+        max-width:150px;
     }
 
     .preloader-text{
-        font-size:10px;
-        letter-spacing:4px;
-        margin-bottom:24px;
+        font-size:9px;
+        letter-spacing:3.5px;
+        margin-bottom:18px;
     }
 
     .preloader-line{
-        width:140px;
+        width:100px;
+        height:1px;
     }
 }
