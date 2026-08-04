@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: lino-perfume
+    env: python
+    buildCommand: ./build.sh
+    startCommand: gunicorn scentido.wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: DEBUG
+        value: False
