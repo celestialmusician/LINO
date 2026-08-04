@@ -151,3 +151,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+# ==========================================
+# RAZORPAY PAYMENT GATEWAY SETTINGS
+# ==========================================
+
+RAZORPAY_KEY_ID = config('RAZORPAY_KEY_ID', default='rzp_test_lino_dummy')
+RAZORPAY_KEY_SECRET = config('RAZORPAY_KEY_SECRET', default='lino_dummy_secret')

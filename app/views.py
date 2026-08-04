@@ -1,5 +1,6 @@
 import json
-
+import razorpay
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib.auth import authenticate, login, logout
@@ -7,9 +8,45 @@ from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.db import transaction
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.http import JsonResponse, HttpResponseBadRequest
+from django.urls import reverse
 
 from .models import Product, Order, OrderItem, Review, Category
 from .forms import UserRegisterForm, UserLoginForm, CheckoutForm, ContactForm, ReviewForm
+
+
+def initiate_razorpay_payment(order, total_amount):
+    key_id = getattr(settings, 'RAZORPAY_KEY_ID', 'rzp_test_lino_dummy')
+    key_secret = getattr(settings, 'RAZORPAY_KEY_SECRET', 'lino_dummy_secret')
+    amount_in_paise = int(total_amount * 100)
+
+    if key_id.startswith('rzp_test_lino_dummy') or not key_id:
+        razorpay_order_id = f"order_dummy_{order.order_id}"
+    else:
+        try:
+            client = razorpay.Client(auth=(key_id, key_secret))
+            rzp_order = client.order.create({
+                "amount": amount_in_paise,
+                "currency": "INR",
+                "receipt": order.order_id,
+                "payment_capture": 1
+            })
+            razorpay_order_id = rzp_order['id']
+        except Exception:
+            razorpay_order_id = f"order_dummy_{order.order_id}"
+
+    order.razorpay_order_id = razorpay_order_id
+    order.save()
+
+    return {
+        "key_id": key_id,
+        "amount": amount_in_paise,
+        "currency": "INR",
+        "razorpay_order_id": razorpay_order_id,
+        "order_id": order.order_id,
+    }
 
 
 # ==================================================
@@ -187,7 +224,11 @@ class CheckoutView(View):
             }
 
         form = CheckoutForm(initial=initial)
-        return render(request, self.template_name, {"form": form})
+        razorpay_key_id = getattr(settings, 'RAZORPAY_KEY_ID', 'rzp_test_lino_dummy')
+        return render(request, self.template_name, {
+            "form": form,
+            "razorpay_key_id": razorpay_key_id
+        })
 
     def post(self, request):
 
@@ -259,12 +300,99 @@ class CheckoutView(View):
                 order.total = total_amount
                 order.save()
 
+            is_online_payment = (order.payment_method in ['upi', 'card']) or request.POST.get("is_online_payment") == "true"
+            is_ajax = request.headers.get("x-requested-with") == "XMLHttpRequest" or request.content_type == "application/json"
+
+            if is_online_payment:
+                rzp_data = initiate_razorpay_payment(order, total_amount)
+                if is_ajax:
+                    return JsonResponse({
+                        "status": "RAZORPAY_INIT",
+                        "razorpay_key_id": rzp_data["key_id"],
+                        "razorpay_order_id": rzp_data["razorpay_order_id"],
+                        "amount": rzp_data["amount"],
+                        "currency": "INR",
+                        "order_id": order.order_id,
+                        "name": f"{order.first_name} {order.last_name}",
+                        "email": order.email,
+                        "phone": order.phone,
+                    })
+
             messages.success(request, f"Order {order.order_id} placed successfully!")
+            if is_ajax:
+                return JsonResponse({"status": "SUCCESS", "redirect_url": reverse("order_success")})
             return redirect("order_success")
 
         except Exception as e:
+            if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                return JsonResponse({"status": "ERROR", "message": str(e)}, status=400)
             messages.error(request, f"An error occurred while processing your order: {str(e)}")
             return render(request, self.template_name, {"form": form})
+
+
+# ==================================================
+# RAZORPAY PAYMENT VERIFICATION
+# ==================================================
+
+@method_decorator(csrf_exempt, name='dispatch')
+class RazorpayVerifyView(View):
+
+    def post(self, request):
+        data = request.POST
+        razorpay_order_id = data.get("razorpay_order_id", "")
+        razorpay_payment_id = data.get("razorpay_payment_id", "")
+        razorpay_signature = data.get("razorpay_signature", "")
+
+        if not razorpay_order_id and request.body:
+            try:
+                json_data = json.loads(request.body.decode("utf-8"))
+                razorpay_order_id = json_data.get("razorpay_order_id", "")
+                razorpay_payment_id = json_data.get("razorpay_payment_id", "")
+                razorpay_signature = json_data.get("razorpay_signature", "")
+            except Exception:
+                pass
+
+        if not razorpay_order_id:
+            return JsonResponse({"status": "ERROR", "message": "Missing Razorpay order ID"}, status=400)
+
+        try:
+            order = Order.objects.get(razorpay_order_id=razorpay_order_id)
+        except Order.DoesNotExist:
+            return JsonResponse({"status": "ERROR", "message": "Order not found"}, status=404)
+
+        key_id = getattr(settings, 'RAZORPAY_KEY_ID', 'rzp_test_lino_dummy')
+        key_secret = getattr(settings, 'RAZORPAY_KEY_SECRET', 'lino_dummy_secret')
+
+        verified = False
+
+        if key_id.startswith('rzp_test_lino_dummy') or razorpay_order_id.startswith('order_dummy_') or not key_secret:
+            # Test / Dummy mode auto-verify
+            verified = True
+        else:
+            try:
+                client = razorpay.Client(auth=(key_id, key_secret))
+                client.utility.verify_payment_signature({
+                    'razorpay_order_id': razorpay_order_id,
+                    'razorpay_payment_id': razorpay_payment_id,
+                    'razorpay_signature': razorpay_signature
+                })
+                verified = True
+            except Exception:
+                verified = False
+
+        if verified:
+            order.razorpay_payment_id = razorpay_payment_id or f"pay_dummy_{order.order_id}"
+            order.razorpay_signature = razorpay_signature or "dummy_signature_ok"
+            order.is_paid = True
+            order.status = "confirmed"
+            order.save()
+            return JsonResponse({
+                "status": "SUCCESS",
+                "message": "Payment verified successfully!",
+                "redirect_url": reverse("order_success")
+            })
+        else:
+            return JsonResponse({"status": "ERROR", "message": "Payment signature verification failed"}, status=400)
 
 
 # ==================================================

@@ -223,8 +223,8 @@ class OrderAdmin(admin.ModelAdmin):
         "first_name",
         "last_name",
         "email",
-        "phone",
         "payment_method",
+        "is_paid",
         "total",
         "status",
         "created_at",
@@ -232,9 +232,9 @@ class OrderAdmin(admin.ModelAdmin):
 
     list_display_links = ("order_id",)
 
-    list_editable = ("status",)
+    list_editable = ("status", "is_paid")
 
-    list_filter = ("status", "payment_method", "created_at")
+    list_filter = ("status", "payment_method", "is_paid", "created_at")
 
     search_fields = (
         "order_id",
@@ -242,10 +242,12 @@ class OrderAdmin(admin.ModelAdmin):
         "last_name",
         "email",
         "phone",
+        "razorpay_order_id",
+        "razorpay_payment_id",
         "tracking_number",
     )
 
-    readonly_fields = ("order_id", "created_at")
+    readonly_fields = ("order_id", "razorpay_order_id", "razorpay_payment_id", "razorpay_signature", "created_at")
 
     ordering = ("-created_at",)
 

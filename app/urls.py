@@ -58,6 +58,12 @@ urlpatterns = [
     ),
 
     path(
+        "razorpay-verify/",
+        views.RazorpayVerifyView.as_view(),
+        name="razorpay_verify",
+    ),
+
+    path(
         "order-success/",
         views.OrderSuccessView.as_view(),
         name="order_success",

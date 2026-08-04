@@ -302,6 +302,25 @@ class Order(models.Model):
         default="cod"
     )
 
+    is_paid = models.BooleanField(
+        default=False
+    )
+
+    razorpay_order_id = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    razorpay_payment_id = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    razorpay_signature = models.CharField(
+        max_length=255,
+        blank=True
+    )
+
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,

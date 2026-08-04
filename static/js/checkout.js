@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     //--------------------------------------
-    // FORM SUBMIT → inject cart JSON
+    // FORM SUBMIT → handle COD & Razorpay Online
     //--------------------------------------
 
     if (form) {
@@ -116,12 +116,140 @@ document.addEventListener("DOMContentLoaded", () => {
                 cartDataInput.value = JSON.stringify(cart);
             }
 
-            // Clear cart from localStorage after successful form submit
-            // (happens after redirect, so we store a flag)
-            sessionStorage.setItem("clearCartOnLoad", "true");
+            const paymentSelect = form.querySelector('[name="payment_method"]');
+            const paymentMethod = paymentSelect ? paymentSelect.value : "cod";
+
+            if (paymentMethod === "upi" || paymentMethod === "card") {
+                e.preventDefault();
+
+                const submitBtn = document.getElementById("placeOrderBtn");
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = "Processing Payment...";
+                }
+
+                const formData = new FormData(form);
+                formData.append("is_online_payment", "true");
+
+                fetch(form.action, {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "RAZORPAY_INIT") {
+                        openRazorpayModal(data, submitBtn);
+                    } else if (data.status === "SUCCESS") {
+                        localStorage.removeItem("cart");
+                        window.location.href = data.redirect_url;
+                    } else {
+                        alert(data.message || "Error creating payment order.");
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = "Place Order";
+                        }
+                    }
+                })
+                .catch(err => {
+                    alert("Order processing error: " + err);
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = "Place Order";
+                    }
+                });
+            } else {
+                // COD Flow
+                sessionStorage.setItem("clearCartOnLoad", "true");
+            }
 
         });
 
+    }
+
+    function openRazorpayModal(rzpData, submitBtn) {
+        const options = {
+            "key": rzpData.razorpay_key_id,
+            "amount": rzpData.amount,
+            "currency": "INR",
+            "name": "LINO Luxury Perfumes",
+            "description": `Order #${rzpData.order_id}`,
+            "image": "/static/images/logo/lino-logo-white.png",
+            "order_id": rzpData.razorpay_order_id,
+            "handler": function (response) {
+                if (submitBtn) submitBtn.textContent = "Verifying Payment...";
+
+                fetch("/razorpay-verify/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    body: new URLSearchParams({
+                        "razorpay_order_id": response.razorpay_order_id || rzpData.razorpay_order_id,
+                        "razorpay_payment_id": response.razorpay_payment_id || `pay_dummy_${rzpData.order_id}`,
+                        "razorpay_signature": response.razorpay_signature || "dummy_signature_ok"
+                    })
+                })
+                .then(res => res.json())
+                .then(verRes => {
+                    if (verRes.status === "SUCCESS") {
+                        localStorage.removeItem("cart");
+                        window.location.href = verRes.redirect_url;
+                    } else {
+                        alert("Payment verification failed: " + verRes.message);
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = "Place Order";
+                        }
+                    }
+                })
+                .catch(err => {
+                    alert("Verification error: " + err);
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = "Place Order";
+                    }
+                });
+            },
+            "prefill": {
+                "name": rzpData.name,
+                "email": rzpData.email,
+                "contact": rzpData.phone
+            },
+            "theme": {
+                "color": "#D4AF37"
+            },
+            "modal": {
+                "ondismiss": function() {
+                    alert("Payment modal closed. You can complete payment or switch to Cash on Delivery.");
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = "Place Order";
+                    }
+                }
+            }
+        };
+
+        if (typeof Razorpay !== "undefined" && !rzpData.razorpay_key_id.startsWith("rzp_test_lino_dummy")) {
+            const rzp = new Razorpay(options);
+            rzp.open();
+        } else {
+            // Interactive Test / Dummy Mode Simulation Modal
+            setTimeout(() => {
+                if (confirm(`[LINO TEST MODE PAYMENT]\n\nSimulating Razorpay Payment Gateway Modal\n\nOrder ID: #${rzpData.order_id}\nTotal Amount: ₹${(rzpData.amount / 100).toLocaleString('en-IN')}\nPayment Method: Online (UPI / Cards)\n\nClick OK to simulate SUCCESSFUL PAYMENT.`)) {
+                    options.handler({
+                        razorpay_order_id: rzpData.razorpay_order_id,
+                        razorpay_payment_id: `pay_simulated_${rzpData.order_id}`,
+                        razorpay_signature: `sig_simulated_${rzpData.order_id}`
+                    });
+                } else {
+                    options.modal.ondismiss();
+                }
+            }, 300);
+        }
     }
 
 });
