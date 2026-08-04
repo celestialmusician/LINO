@@ -35,8 +35,8 @@
 
                 <div class="order-item-row">
 
-                    {% if item.product and item.product.image %}
-                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                    {% if item.product %}
+                    <img src="{{ item.product.get_image_url }}" alt="{{ item.product.name }}">
                     {% endif %}
 
                     <div class="order-info">

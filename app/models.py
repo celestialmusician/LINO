@@ -190,6 +190,16 @@ class Product(models.Model):
     def get_review_count(self):
         return self.reviews.filter(is_approved=True).count()
 
+    @property
+    def get_image_url(self):
+        if self.image and hasattr(self.image, 'url'):
+            try:
+                return self.image.url
+            except Exception:
+                pass
+        clean_name = self.name.replace(" ", "-").upper()
+        return f"/static/images/products/{clean_name}.png"
+
     def __str__(self):
 
         return self.name

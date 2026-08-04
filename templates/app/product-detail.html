@@ -37,7 +37,7 @@
                 <div class="product-image-wrapper">
 
                     <img
-                        src="{{ product.image.url }}"
+                        src="{{ product.get_image_url }}"
                         alt="{{ product.name }}">
 
                 </div>
@@ -98,7 +98,7 @@
 
     data-price="{{ product.price }}"
 
-    data-image="{{ product.image.url }}"
+    data-image="{{ product.get_image_url }}"
 
     data-slug="{{ product.slug }}">
 
@@ -111,7 +111,7 @@
                     <button class="btn-secondary wishlist-detail-btn"
                         data-name="{{ product.name }}"
                         data-price="{{ product.price }}"
-                        data-image="{{ product.image.url }}"
+                        data-image="{{ product.get_image_url }}"
                         data-slug="{{ product.slug }}">
 
                         <i class="fa-regular fa-heart"></i>

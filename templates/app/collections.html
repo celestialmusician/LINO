@@ -239,7 +239,7 @@ Collections | LINO
                 data-name="{{ product.name }}"
                 data-price="₹ {{ product.price }}"
                 data-subtitle="{{ product.subtitle }}"
-                data-image="{{ product.image.url }}"
+                data-image="{{ product.get_image_url }}"
                 data-slug="{{ product.slug }}"
                 data-link="{% url 'product-detail' product.slug %}">
 
@@ -252,7 +252,7 @@ Collections | LINO
                 <a href="{% url 'product-detail' product.slug %}">
 
                     <img
-                        src="{{ product.image.url }}"
+                        src="{{ product.get_image_url }}"
                         alt="{{ product.name }}">
 
                 </a>
