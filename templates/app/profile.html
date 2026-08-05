@@ -17,9 +17,9 @@
 
             <div class="profile-top">
 
-                <img
-                    src="{% static 'images/profile-avatar.png' %}"
-                    alt="Profile">
+                <div class="avatar-wrapper" style="width: 100px; height: 100px; margin: 0 auto 16px; background: #111; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 700; border: 3px solid #D4AF37;">
+                    {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}
+                </div>
 
                 <h2 id="userName">
                     {{ request.user.get_full_name|default:request.user.username }}
@@ -45,12 +45,12 @@
 
                 <a href="{% url 'collections' %}">
                     <span><i class="fa-solid fa-spray-can-sparkles"></i></span>
-                    Shop Now
+                    Shop Collection
                 </a>
 
                 <a href="{% url 'logout' %}" id="logoutBtn">
                     <span><i class="fa-solid fa-right-from-bracket"></i></span>
-                    Logout
+                    Sign Out
                 </a>
 
             </div>
@@ -59,20 +59,26 @@
 
         <div class="profile-content">
 
+            {% if messages %}
+            <div class="auth-messages" style="margin-bottom: 20px;">
+                {% for message in messages %}
+                <div class="auth-message auth-message--{{ message.tags }}" style="padding: 14px 20px; border-radius: 14px; background: #e6f4ea; color: #137333; border: 1px solid #ceedd5; font-size: 14px;">
+                    <i class="fa-solid fa-circle-check" style="margin-right: 8px;"></i> {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
             <div class="welcome-card">
 
                 <small>WELCOME BACK</small>
 
                 <h1>
-
-                    Your Luxury Fragrance Journey Starts Here
-
+                    Hello, {{ request.user.first_name|default:request.user.username }}
                 </h1>
 
                 <p>
-
-                    Manage your orders, wishlist and account details from one beautiful dashboard.
-
+                    Manage your fragrance orders, wishlist items, and personal account preferences.
                 </p>
 
             </div>
@@ -115,10 +121,31 @@
 
                     <h2>Gold</h2>
 
-                    <p>Premium Member</p>
+                    <p>VIP Privilege Member</p>
 
                 </div>
 
+            </div>
+
+            <!-- Profile Edit Card -->
+            <div class="dash-box" style="margin-top: 10px;">
+                <h3 style="font-size: 20px; color: #111; margin-bottom: 20px;">Account Information</h3>
+                <form method="POST" action="{% url 'profile' %}">
+                    {% csrf_token %}
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                        <div>
+                            <label style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #666; margin-bottom: 6px;">Full Name</label>
+                            <input type="text" name="full_name" value="{{ request.user.get_full_name|default:request.user.username }}" required style="width: 100%; height: 46px; padding: 0 16px; border: 1px solid #e0e0dc; border-radius: 12px; font-size: 14px; box-sizing: border-box;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #666; margin-bottom: 6px;">Email Address</label>
+                            <input type="email" name="email" value="{{ request.user.email }}" required style="width: 100%; height: 46px; padding: 0 16px; border: 1px solid #e0e0dc; border-radius: 12px; font-size: 14px; box-sizing: border-box;">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary" style="background: #111; color: #fff; border: none; padding: 12px 28px; border-radius: 999px; font-weight: 600; cursor: pointer; transition: 0.3s;">
+                        Save Profile Details
+                    </button>
+                </form>
             </div>
 
         </div>
@@ -128,7 +155,6 @@
 </section>
 
 <script>
-    // Update wishlist count from localStorage on the profile page
     document.addEventListener("DOMContentLoaded", function () {
         const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
         const el = document.getElementById("profileWishlistCount");

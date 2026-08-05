@@ -154,14 +154,13 @@
 
 </head>
 
-<body>
-
-    <a href="#main-content" class="skip-link">
-    
-    </a>
-
+    <script>
+        window.IS_USER_AUTHENTICATED = {% if request.user.is_authenticated %}true{% else %}false{% endif %};
+        window.REQUIRE_MANDATORY_AUTH = {% if require_auth %}true{% else %}false{% endif %};
+    </script>
 
     {% include "app/navbar.html" %}
+    {% include "app/components/auth_modal.html" %}
 
 
 
@@ -442,6 +441,8 @@
     <script src="{% static 'js/cursor.js' %}"></script>
 
     <script src="{% static 'js/collections.js' %}"></script>
+
+    <script src="{% static 'js/auth-modal.js' %}"></script>
 
 
 </body>

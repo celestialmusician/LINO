@@ -14,7 +14,7 @@ from django.http import JsonResponse, HttpResponseBadRequest
 from django.urls import reverse
 
 from .models import Product, Order, OrderItem, Review, Category
-from .forms import UserRegisterForm, UserLoginForm, CheckoutForm, ContactForm, ReviewForm
+from .forms import UserRegisterForm, UserLoginForm, UserProfileForm, CheckoutForm, ContactForm, ReviewForm
 
 
 def initiate_razorpay_payment(order, total_amount):
@@ -227,10 +227,17 @@ class CheckoutView(View):
         razorpay_key_id = getattr(settings, 'RAZORPAY_KEY_ID', 'rzp_test_lino_dummy')
         return render(request, self.template_name, {
             "form": form,
-            "razorpay_key_id": razorpay_key_id
+            "razorpay_key_id": razorpay_key_id,
+            "require_auth": not request.user.is_authenticated
         })
 
     def post(self, request):
+        if not request.user.is_authenticated:
+            is_ajax = request.headers.get("x-requested-with") == "XMLHttpRequest" or request.content_type == "application/json"
+            if is_ajax:
+                return JsonResponse({"status": "REQUIRE_AUTH", "message": "Please sign in or create an account to place your order."}, status=401)
+            messages.error(request, "Please sign in or create an account to place your order.")
+            return redirect(f"{reverse('login')}?next={reverse('checkout')}")
 
         form = CheckoutForm(request.POST)
         cart_json = request.POST.get("cart_data", "[]")
@@ -417,12 +424,44 @@ class ProfileView(LoginRequiredMixin, View):
 
     def get(self, request):
         orders = Order.objects.filter(user=request.user).order_by("-created_at")
+        form = UserProfileForm(initial={
+            'full_name': request.user.get_full_name() or request.user.username,
+            'email': request.user.email,
+        })
         return render(
             request,
             "app/profile.html",
             {
                 "orders": orders,
                 "order_count": orders.count(),
+                "form": form,
+            }
+        )
+
+    def post(self, request):
+        orders = Order.objects.filter(user=request.user).order_by("-created_at")
+        form = UserProfileForm(request.POST)
+
+        if form.is_valid():
+            full_name = form.cleaned_data['full_name']
+            email = form.cleaned_data['email']
+
+            name_parts = full_name.split(" ", 1)
+            request.user.first_name = name_parts[0]
+            request.user.last_name = name_parts[1] if len(name_parts) > 1 else ""
+            request.user.email = email
+            request.user.save()
+
+            messages.success(request, "Your profile details have been updated successfully.")
+            return redirect("profile")
+
+        return render(
+            request,
+            "app/profile.html",
+            {
+                "orders": orders,
+                "order_count": orders.count(),
+                "form": form,
             }
         )
 
@@ -454,6 +493,7 @@ class LoginView(View):
         return render(request, self.template_name, {"form": form})
 
     def post(self, request):
+        is_ajax = request.headers.get("x-requested-with") == "XMLHttpRequest" or request.content_type == "application/json"
         form = UserLoginForm(request.POST)
 
         if form.is_valid():
@@ -464,17 +504,41 @@ class LoginView(View):
                 user_obj = User.objects.get(email=email)
                 username = user_obj.username
             except User.DoesNotExist:
-                messages.error(request, "No account found with this email address.")
+                msg = "No account found with this email address."
+                if is_ajax:
+                    return JsonResponse({"status": "ERROR", "message": msg}, status=400)
+                messages.error(request, msg)
                 return render(request, self.template_name, {"form": form})
 
             user = authenticate(request, username=username, password=password)
 
             if user is not None:
                 login(request, user)
-                next_url = request.GET.get("next", "home")
+                next_url = request.POST.get("next") or request.GET.get("next") or reverse("checkout")
+                if is_ajax:
+                    return JsonResponse({
+                        "status": "SUCCESS",
+                        "message": f"Welcome back, {user.first_name or user.username}!",
+                        "redirect": next_url,
+                        "user": {
+                            "first_name": user.first_name or user.username,
+                            "email": user.email
+                        }
+                    })
+                messages.success(request, f"Welcome back, {user.first_name or user.username}!")
                 return redirect(next_url)
             else:
-                messages.error(request, "Incorrect password. Please try again.")
+                msg = "Incorrect password. Please try again."
+                if is_ajax:
+                    return JsonResponse({"status": "ERROR", "message": msg}, status=400)
+                messages.error(request, msg)
+        else:
+            errors = []
+            for field, errs in form.errors.items():
+                errors.extend(errs)
+            msg = " ".join(errors) or "Invalid email or password."
+            if is_ajax:
+                return JsonResponse({"status": "ERROR", "message": msg}, status=400)
 
         return render(request, self.template_name, {"form": form})
 
@@ -490,6 +554,7 @@ class RegisterView(View):
         return render(request, self.template_name, {"form": form})
 
     def post(self, request):
+        is_ajax = request.headers.get("x-requested-with") == "XMLHttpRequest" or request.content_type == "application/json"
         form = UserRegisterForm(request.POST)
 
         if form.is_valid():
@@ -512,8 +577,26 @@ class RegisterView(View):
             )
 
             login(request, user)
+            next_url = request.POST.get("next") or request.GET.get("next") or reverse("checkout")
+            if is_ajax:
+                return JsonResponse({
+                    "status": "SUCCESS",
+                    "message": f"Welcome to LINO, {first_name}!",
+                    "redirect": next_url,
+                    "user": {
+                        "first_name": first_name,
+                        "email": email
+                    }
+                })
             messages.success(request, f"Welcome to LINO, {first_name}!")
-            return redirect("home")
+            return redirect(next_url)
+        else:
+            errors = []
+            for field, errs in form.errors.items():
+                errors.extend(errs)
+            msg = " ".join(errors) or "Please check registration details."
+            if is_ajax:
+                return JsonResponse({"status": "ERROR", "message": msg}, status=400)
 
         return render(request, self.template_name, {"form": form})
 

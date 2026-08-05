@@ -108,6 +108,17 @@
 
 </button>
 
+                    <button
+                        id="buyNowDetailBtn"
+                        class="btn-buy-now"
+                        data-name="{{ product.name }}"
+                        data-price="{{ product.price }}"
+                        data-image="{{ product.get_image_url }}"
+                        data-slug="{{ product.slug }}">
+                        <i class="fa-solid fa-bolt"></i>
+                        Buy Now
+                    </button>
+
                     <button class="btn-secondary wishlist-detail-btn"
                         data-name="{{ product.name }}"
                         data-price="{{ product.price }}"

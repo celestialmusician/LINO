@@ -1,0 +1,113 @@
+{% load static %}
+
+<!-- ==========================================
+      MANDATORY AUTHENTICATION MODAL (LINO LUXURY)
+========================================== -->
+
+<div class="auth-modal-overlay" id="mandatoryAuthModal" aria-hidden="true" data-lenis-prevent>
+
+    <div class="auth-modal-card" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+
+        <!-- Close Button -->
+        <button type="button" class="auth-modal-close" id="authModalClose" aria-label="Close Modal">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <div class="auth-modal-header">
+            <span class="auth-modal-tag"><i class="fa-solid fa-lock"></i> MANDATORY AUTHENTICATION</span>
+            <h2 id="authModalTitle">Sign In Required</h2>
+            <p id="authModalSubtitle">Please sign in or create an account to proceed with placing your order.</p>
+        </div>
+
+        <!-- Dynamic Error/Success Alert -->
+        <div class="auth-modal-alert" id="authModalAlert" style="display: none;"></div>
+
+        <!-- Quick Switcher Tabs & Direct Action Buttons -->
+        <div class="auth-modal-tabs">
+            <button type="button" class="auth-tab-btn active" id="tabLoginBtn" data-tab="login">
+                <i class="fa-solid fa-right-to-bracket"></i> Sign In
+            </button>
+            <button type="button" class="auth-tab-btn" id="tabRegisterBtn" data-tab="register">
+                <i class="fa-solid fa-user-plus"></i> Create Account
+            </button>
+        </div>
+
+        <!-- Form Panels -->
+        <div class="auth-modal-body">
+
+            <!-- SIGN IN PANEL -->
+            <div class="auth-panel active" id="authPanelLogin">
+                <form id="authModalLoginForm" method="POST" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{% url 'checkout' %}">
+
+                    <div class="auth-input-group">
+                        <label><i class="fa-regular fa-envelope"></i> Email Address</label>
+                        <input type="email" name="email" placeholder="name@example.com" required>
+                    </div>
+
+                    <div class="auth-input-group">
+                        <label><i class="fa-solid fa-lock"></i> Password</label>
+                        <input type="password" name="password" placeholder="Enter your password" required>
+                    </div>
+
+                    <button type="submit" class="auth-submit-btn" id="authLoginSubmitBtn">
+                        <span>Sign In to Continue</span>
+                        <i class="fa-solid fa-arrow-right-long"></i>
+                    </button>
+                </form>
+
+                <div class="auth-panel-footer">
+                    <span>Don't have an account?</span>
+                    <button type="button" class="auth-link-btn" onclick="switchAuthTab('register')">Create an Account</button>
+                </div>
+            </div>
+
+            <!-- CREATE ACCOUNT PANEL -->
+            <div class="auth-panel" id="authPanelRegister">
+                <form id="authModalRegisterForm" method="POST" action="{% url 'register' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{% url 'checkout' %}">
+
+                    <div class="auth-input-group">
+                        <label><i class="fa-regular fa-user"></i> Full Name</label>
+                        <input type="text" name="full_name" placeholder="John Doe" required>
+                    </div>
+
+                    <div class="auth-input-group">
+                        <label><i class="fa-regular fa-envelope"></i> Email Address</label>
+                        <input type="email" name="email" placeholder="name@example.com" required>
+                    </div>
+
+                    <div class="auth-input-group">
+                        <label><i class="fa-solid fa-mobile-screen-button"></i> Mobile Number</label>
+                        <input type="tel" name="phone" placeholder="10-digit phone number">
+                    </div>
+
+                    <div class="auth-input-group">
+                        <label><i class="fa-solid fa-key"></i> Password (min 8 chars)</label>
+                        <input type="password" name="password" placeholder="Create password" required minlength="8">
+                    </div>
+
+                    <div class="auth-input-group">
+                        <label><i class="fa-solid fa-check-double"></i> Confirm Password</label>
+                        <input type="password" name="confirm_password" placeholder="Confirm password" required>
+                    </div>
+
+                    <button type="submit" class="auth-submit-btn" id="authRegisterSubmitBtn">
+                        <span>Create Account & Place Order</span>
+                        <i class="fa-solid fa-arrow-right-long"></i>
+                    </button>
+                </form>
+
+                <div class="auth-panel-footer">
+                    <span>Already registered?</span>
+                    <button type="button" class="auth-link-btn" onclick="switchAuthTab('login')">Sign In Instead</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

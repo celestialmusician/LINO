@@ -203,7 +203,118 @@ document.addEventListener("DOMContentLoaded", () => {
 
         container.innerHTML = html;
 
-        // renderSummary();
+        renderSummary();
+
+        //----------------------------------------
+        // RENDER SUMMARY
+        //----------------------------------------
+
+        function renderSummary() {
+
+            if (!summary) return;
+
+            const cart = getCart();
+
+            if (cart.length === 0) {
+
+                summary.innerHTML = "";
+
+                return;
+
+            }
+
+            let subtotal = 0;
+
+            cart.forEach(item => {
+
+                const rawPrice = String(item.price).replace(/[^\d.]/g, "");
+
+                const price = parseFloat(rawPrice) || 0;
+
+                subtotal += price * (item.quantity || 1);
+
+            });
+
+            summary.innerHTML = `
+
+                <div class="cart-summary">
+
+                    <h2>Order Summary</h2>
+
+                    <div class="summary-row">
+
+                        <span>Subtotal (${cart.length} item${cart.length !== 1 ? "s" : ""})</span>
+
+                        <strong>₹ ${subtotal.toLocaleString("en-IN")}</strong>
+
+                    </div>
+
+                    <div class="summary-row">
+
+                        <span>Shipping</span>
+
+                        <strong style="color: #137333;">FREE</strong>
+
+                    </div>
+
+                    <div class="summary-row total">
+
+                        <span>Total</span>
+
+                        <strong>₹ ${subtotal.toLocaleString("en-IN")}</strong>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        id="proceedCheckoutBtn"
+                        class="checkout-btn">
+
+                        Proceed to Checkout
+
+                    </button>
+
+                    <a href="/collections/" class="continue-shopping">
+
+                        Continue Shopping
+
+                    </a>
+
+                </div>
+
+            `;
+
+            const checkoutBtn = document.getElementById("proceedCheckoutBtn");
+
+            if (checkoutBtn) {
+
+                checkoutBtn.addEventListener("click", (e) => {
+
+                    e.preventDefault();
+
+                    if (!window.IS_USER_AUTHENTICATED) {
+
+                        if (typeof window.openAuthModal === "function") {
+
+                            window.openAuthModal("checkout", "/checkout/");
+
+                        } else {
+
+                            window.location.href = "/login/?next=/checkout/";
+
+                        }
+
+                    } else {
+
+                        window.location.href = "/checkout/";
+
+                    }
+
+                });
+
+            }
+
+        }
 
     
 

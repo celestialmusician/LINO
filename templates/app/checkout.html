@@ -147,30 +147,100 @@
 
                         </div>
 
-                        <div class="form-row">
+                        <input
+                            type="text"
+                            name="pincode"
+                            placeholder="PIN Code (6 digits)"
+                            value="{{ form.pincode.value|default:'' }}"
+                            required
+                        >
 
-                            <input
-                                type="text"
-                                name="pincode"
-                                placeholder="PIN Code (6 digits)"
-                                value="{{ form.pincode.value|default:'' }}"
-                                required
-                            >
+                        <!-- Premium Payment Method Dropdown (Mandatory Field) -->
+                        <div class="payment-dropdown-wrapper" id="paymentDropdownWrapper">
+                            <label class="payment-dropdown-label">
+                                <i class="fa-solid fa-wallet"></i> Payment Method <span class="required-star">*</span>
+                            </label>
 
-                            <select name="payment_method" class="checkout-select" required>
-                                <option value="cod">Cash on Delivery (COD)</option>
-                                <option value="upi">UPI / GPay / PhonePe</option>
-                                <option value="card">Credit / Debit Card</option>
-                            </select>
+                            <!-- Hidden input (empty by default so payment selection is mandatory) -->
+                            <input type="hidden" name="payment_method" id="paymentMethodInput" value="" required>
 
+                            <!-- Validation Error Message Banner -->
+                            <div class="payment-error-msg" id="paymentErrorMsg" style="display: none;">
+                                <i class="fa-solid fa-circle-exclamation"></i> Please select a payment method before placing your order.
+                            </div>
+
+                            <!-- Custom Select Trigger -->
+                            <div class="premium-select-trigger is-placeholder" id="paymentDropdownTrigger" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox">
+                                <div class="select-selected-info">
+                                    <div class="select-selected-icon" id="selectedPaymentIcon">
+                                        <i class="fa-solid fa-wallet"></i>
+                                    </div>
+                                    <div class="select-selected-text">
+                                        <span class="selected-title" id="selectedPaymentTitle">Select Payment Method *</span>
+                                        <span class="selected-subtitle" id="selectedPaymentSubtitle">Click to choose your payment option</span>
+                                    </div>
+                                </div>
+                                <div class="select-arrow-icon">
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </div>
+                            </div>
+
+                            <!-- Dropdown Options Menu -->
+                            <div class="premium-select-options" id="paymentDropdownMenu" role="listbox">
+                                <!-- Option 1: COD -->
+                                <div class="premium-option" data-value="cod" data-title="Cash on Delivery (COD)" data-subtitle="Pay with cash upon delivery at your doorstep" data-icon="fa-solid fa-hand-holding-dollar" role="option">
+                                    <div class="option-icon">
+                                        <i class="fa-solid fa-hand-holding-dollar"></i>
+                                    </div>
+                                    <div class="option-content">
+                                        <div class="option-title-row">
+                                            <span class="option-title">Cash on Delivery (COD)</span>
+                                            <span class="option-tag">Standard</span>
+                                        </div>
+                                        <span class="option-desc">Pay with cash upon delivery at your doorstep</span>
+                                    </div>
+                                    <i class="fa-solid fa-check option-check"></i>
+                                </div>
+
+                                <!-- Option 2: UPI -->
+                                <div class="premium-option" data-value="upi" data-title="UPI / GPay / PhonePe" data-subtitle="Pay instantly via Google Pay, PhonePe, Paytm, or BHIM UPI" data-icon="fa-solid fa-mobile-screen-button" role="option">
+                                    <div class="option-icon option-icon--gold">
+                                        <i class="fa-solid fa-mobile-screen-button"></i>
+                                    </div>
+                                    <div class="option-content">
+                                        <div class="option-title-row">
+                                            <span class="option-title">UPI / GPay / PhonePe</span>
+                                            <span class="option-tag tag--gold"><i class="fa-solid fa-bolt"></i> Fast & Instant</span>
+                                        </div>
+                                        <span class="option-desc">Pay instantly via Google Pay, PhonePe, Paytm, or BHIM UPI</span>
+                                    </div>
+                                    <i class="fa-solid fa-check option-check"></i>
+                                </div>
+
+                                <!-- Option 3: Credit/Debit Card -->
+                                <div class="premium-option" data-value="card" data-title="Credit / Debit Card" data-subtitle="Visa, Mastercard, RuPay & American Express supported" data-icon="fa-solid fa-credit-card" role="option">
+                                    <div class="option-icon">
+                                        <i class="fa-solid fa-credit-card"></i>
+                                    </div>
+                                    <div class="option-content">
+                                        <div class="option-title-row">
+                                            <span class="option-title">Credit / Debit Card</span>
+                                            <span class="option-tag"><i class="fa-solid fa-shield-halved"></i> 256-bit SSL</span>
+                                        </div>
+                                        <span class="option-desc">Visa, Mastercard, RuPay & American Express supported</span>
+                                    </div>
+                                    <i class="fa-solid fa-check option-check"></i>
+                                </div>
+                            </div>
                         </div>
 
                         <button
                             type="submit"
                             id="placeOrderBtn"
-                            class="checkout-btn">
+                            class="checkout-btn btn-luxury-submit">
 
-                            Place Order
+                            <span>Place Order</span>
+                            <i class="fa-solid fa-shield-halved"></i>
 
                         </button>
 

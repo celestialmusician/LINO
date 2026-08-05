@@ -54,6 +54,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 cartBtn.dataset.price = button.dataset.price;
                 cartBtn.dataset.image = button.dataset.image;
 
+                // Check if already in cart
+                const cartItems = (typeof getCart === "function") ? getCart() : (JSON.parse(localStorage.getItem("cart")) || []);
+                const isInCart = cartItems.some(item => item.slug === button.dataset.slug);
+                if (isInCart) {
+                    cartBtn.innerHTML = `<i class="fa-solid fa-bag-shopping"></i> View In Bag`;
+                    cartBtn.classList.add("btn--in-cart");
+                    cartBtn.dataset.inCart = "true";
+                } else {
+                    cartBtn.innerHTML = `<i class="fa-solid fa-bag-shopping"></i> Add To Bag`;
+                    cartBtn.classList.remove("btn--in-cart");
+                    cartBtn.dataset.inCart = "false";
+                }
+
             }
 
             if (buyNowBtn) {
@@ -171,31 +184,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
             e.preventDefault();
 
-            const product = {
+            if (cartBtn.dataset.inCart === "true") {
+                // Second tap -> Navigate directly to shopping bag
+                window.location.href = "/cart/";
+                return;
+            }
 
+            const product = {
                 name: cartBtn.dataset.name,
                 price: cartBtn.dataset.price,
                 image: cartBtn.dataset.image,
                 slug: cartBtn.dataset.slug,
                 quantity: quantity
-
             };
 
-            addToCart(product);
+            if (typeof addToCart === "function") {
+                addToCart(product);
+            }
 
-            cartBtn.innerHTML = `
-                <i class="fa-solid fa-circle-check"></i>
-                Added To Bag
-            `;
+            cartBtn.innerHTML = `<i class="fa-solid fa-circle-check"></i> Added! View In Bag`;
+            cartBtn.classList.add("btn--in-cart");
+            cartBtn.dataset.inCart = "true";
 
             setTimeout(() => {
-
-                cartBtn.innerHTML = `
-                    <i class="fa-solid fa-bag-shopping"></i>
-                    Add To Bag
-                `;
-
-            }, 1500);
+                cartBtn.innerHTML = `<i class="fa-solid fa-bag-shopping"></i> View In Bag`;
+            }, 1200);
 
         });
 
@@ -223,7 +236,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
             addToCart(product);
 
-            window.location.href = "/checkout/";
+            if (!window.IS_USER_AUTHENTICATED) {
+                closeModal();
+                if (typeof window.openAuthModal === "function") {
+                    window.openAuthModal("buy_now", "/checkout/");
+                } else {
+                    window.location.href = "/login/?next=/checkout/";
+                }
+            } else {
+                window.location.href = "/checkout/";
+            }
 
         });
 

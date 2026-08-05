@@ -1205,3 +1205,16 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Added In Bag State */
+.btn--in-cart {
+    background: #111111 !important;
+    color: #D4AF37 !important;
+    border: 1px solid #D4AF37 !important;
+    box-shadow: 0 8px 20px rgba(212, 175, 55, 0.25) !important;
+}
+
+.btn--in-cart:hover {
+    background: #000000 !important;
+    color: #ffffff !important;
+}

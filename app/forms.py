@@ -102,6 +102,46 @@ class UserLoginForm(forms.Form):
 
 
 # ==================================================
+# USER PROFILE FORM
+# ==================================================
+
+class UserProfileForm(forms.Form):
+
+    full_name = forms.CharField(
+        max_length=150,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Full Name',
+            'required': True,
+        })
+    )
+
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'placeholder': 'Email Address',
+            'required': True,
+        })
+    )
+
+    phone = forms.CharField(
+        max_length=15,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Mobile Number',
+        })
+    )
+
+    def clean_phone(self):
+        phone = self.cleaned_data.get('phone', '').strip()
+        if phone:
+            digits = re.sub(r'\D', '', phone)
+            if len(digits) < 10 or len(digits) > 12:
+                raise ValidationError("Please enter a valid mobile number.")
+        return phone
+
+
+# ==================================================
 # CHECKOUT FORM
 # ==================================================
 
@@ -133,6 +173,12 @@ class CheckoutForm(forms.ModelForm):
             'payment_method': forms.Select(attrs={'required': True}),
             'notes': forms.Textarea(attrs={'placeholder': 'Delivery Notes (Optional)', 'rows': 2}),
         }
+
+    def clean_payment_method(self):
+        method = self.cleaned_data.get('payment_method', '').strip()
+        if not method or method not in ['cod', 'upi', 'card']:
+            raise ValidationError("Please select a valid payment method.")
+        return method
 
     def clean_pincode(self):
         pincode = self.cleaned_data.get('pincode', '').strip()

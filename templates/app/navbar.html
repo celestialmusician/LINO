@@ -60,33 +60,34 @@
                     </a>
                 </li>
 
+                {% if request.user.is_authenticated %}
                 <li>
                     <a href="{% url 'profile' %}"
                        class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}"
-                       title="Profile">
-
-                        <i class="fa-regular fa-user"></i>
-
+                       title="Profile ({{ request.user.first_name|default:request.user.username }})">
+                        <i class="fa-solid fa-user"></i>
                     </a>
                 </li>
+                {% else %}
+                <li>
+                    <a href="javascript:void(0)"
+                       onclick="openAuthModal('profile', '{% url 'profile' %}', 'login')"
+                       class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}"
+                       title="Sign In / Register">
+                        <i class="fa-regular fa-user"></i>
+                    </a>
+                </li>
+                {% endif %}
 
             </ul>
 
         </nav>
 
-        <!-- MOBILE MENU BUTTON -->
-
-
         <!-- MOBILE ACTIONS -->
-
 
         <div class="mobile-right">
 
             <div class="mobile-actions">
-
-        <a href="#" class="mobile-action">
-            <i class="fa-solid fa-magnifying-glass"></i>
-        </a>
 
         <a href="{% url 'cart' %}" class="mobile-action cart-btn">
             <i class="fa-solid fa-bag-shopping"></i>
@@ -107,13 +108,6 @@
     </button>
 
 </div>
-
-        
-
-
-
-
-       
 
     </div>
 
@@ -178,25 +172,48 @@
 
         </a>
 
+        {% if request.user.is_authenticated %}
         <a href="{% url 'profile' %}"
-   class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+           class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
 
-    <i class="fa-regular fa-user"></i>
+            <i class="fa-solid fa-user"></i>
 
-    <span>Profile</span>
+            <span>My Profile</span>
 
-</a>
+        </a>
 
-<a href="{% url 'login' %}"
-   class="{% if request.resolver_match.url_name == 'login' %}active{% endif %}">
+        <a href="{% url 'my_orders' %}">
 
-    <i class="fa-solid fa-right-to-bracket"></i>
+            <i class="fa-solid fa-box"></i>
 
-    <span>Sign In</span>
+            <span>My Orders</span>
 
-</a>
+        </a>
 
+        <a href="{% url 'logout' %}">
 
+            <i class="fa-solid fa-right-from-bracket"></i>
+
+            <span>Sign Out</span>
+
+        </a>
+        {% else %}
+        <a href="javascript:void(0)" onclick="openAuthModal('profile', '{% url 'profile' %}', 'login')">
+
+            <i class="fa-solid fa-right-to-bracket"></i>
+
+            <span>Sign In</span>
+
+        </a>
+
+        <a href="javascript:void(0)" onclick="openAuthModal('profile', '{% url 'profile' %}', 'register')">
+
+            <i class="fa-solid fa-user-plus"></i>
+
+            <span>Create Account</span>
+
+        </a>
+        {% endif %}
 
     </nav>
 

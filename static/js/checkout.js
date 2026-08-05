@@ -16,7 +16,67 @@ document.addEventListener("DOMContentLoaded", () => {
     let total = 0;
 
     //--------------------------------------
-    // EMPTY CART
+    // PREMIUM PAYMENT DROPDOWN CONTROLLER
+    //--------------------------------------
+
+    const dropdownWrapper = document.getElementById('paymentDropdownWrapper');
+    const trigger         = document.getElementById('paymentDropdownTrigger');
+    const menu            = document.getElementById('paymentDropdownMenu');
+    const hiddenInput     = document.getElementById('paymentMethodInput');
+    const errorMsg        = document.getElementById('paymentErrorMsg');
+
+    const selectedIcon     = document.getElementById('selectedPaymentIcon');
+    const selectedTitle    = document.getElementById('selectedPaymentTitle');
+    const selectedSubtitle = document.getElementById('selectedPaymentSubtitle');
+
+    if (dropdownWrapper && trigger && menu && hiddenInput) {
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = dropdownWrapper.classList.contains('open');
+            dropdownWrapper.classList.toggle('open');
+            trigger.setAttribute('aria-expanded', !isOpen);
+        });
+
+        const options = menu.querySelectorAll('.premium-option');
+        options.forEach(opt => {
+            opt.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const val = opt.dataset.value;
+                const title = opt.dataset.title;
+                const subtitle = opt.dataset.subtitle;
+                const iconClass = opt.dataset.icon;
+
+                hiddenInput.value = val;
+
+                if (selectedTitle) selectedTitle.textContent = title;
+                if (selectedSubtitle) selectedSubtitle.textContent = subtitle;
+                if (selectedIcon) selectedIcon.innerHTML = `<i class="${iconClass}"></i>`;
+
+                // Remove placeholder styling
+                trigger.classList.remove('is-placeholder');
+
+                // Clear error status
+                dropdownWrapper.classList.remove('has-error');
+                if (errorMsg) errorMsg.style.display = 'none';
+
+                options.forEach(o => o.classList.remove('item-selected'));
+                opt.classList.add('item-selected');
+
+                dropdownWrapper.classList.remove('open');
+                trigger.setAttribute('aria-expanded', 'false');
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!dropdownWrapper.contains(e.target)) {
+                dropdownWrapper.classList.remove('open');
+                trigger.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    //--------------------------------------
+    // EMPTY CART CHECK
     //--------------------------------------
 
     if (!container) return;
@@ -98,12 +158,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     //--------------------------------------
-    // FORM SUBMIT → handle COD & Razorpay Online
+    // FORM SUBMIT → handle mandatory payment & payment options
     //--------------------------------------
 
     if (form) {
 
         form.addEventListener("submit", (e) => {
+
+            if (!window.IS_USER_AUTHENTICATED) {
+                e.preventDefault();
+                if (typeof window.openAuthModal === "function") {
+                    window.openAuthModal("checkout", "/checkout/");
+                } else {
+                    window.location.href = "/login/?next=/checkout/";
+                }
+                return;
+            }
 
             if (cart.length === 0) {
                 e.preventDefault();
@@ -111,13 +181,28 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            // MANDATORY PAYMENT SELECTION CHECK
+            const paymentMethod = hiddenInput ? hiddenInput.value.trim() : "";
+            if (!paymentMethod) {
+                e.preventDefault();
+
+                if (errorMsg) {
+                    errorMsg.style.display = "flex";
+                }
+
+                if (dropdownWrapper) {
+                    dropdownWrapper.classList.add("has-error");
+                    dropdownWrapper.scrollIntoView({ behavior: "smooth", block: "center" });
+                    dropdownWrapper.classList.add("open");
+                    if (trigger) trigger.setAttribute("aria-expanded", "true");
+                }
+                return;
+            }
+
             // Populate hidden field with cart JSON
             if (cartDataInput) {
                 cartDataInput.value = JSON.stringify(cart);
             }
-
-            const paymentSelect = form.querySelector('[name="payment_method"]');
-            const paymentMethod = paymentSelect ? paymentSelect.value : "cod";
 
             if (paymentMethod === "upi" || paymentMethod === "card") {
                 e.preventDefault();
