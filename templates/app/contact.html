@@ -1,16 +1,438 @@
 {% extends 'app/base.html' %}
 {% load static %}
 
+{% block title %}Contact Us | LINO Luxury Perfumes{% endblock %}
+
 {% block content %}
 
-<section style="padding:120px 20px;text-align:center;min-height:70vh;">
+<style>
+/* ==================================================
+   CONTACT US PAGE - LINO LUXURY STYLING
+   ================================================== */
+.contact-page {
+    padding: 130px 20px 90px;
+    min-height: 100vh;
+    background: radial-gradient(circle at 50% 20%, #1a1510 0%, #0d0a08 100%);
+    color: #f5f0eb;
+    font-family: 'Inter', sans-serif;
+}
 
-    <h1>Contact Us</h1>
+.contact-container {
+    max-width: 1180px;
+    margin: 0 auto;
+}
 
-    <p>
-        This page is under development.
-    </p>
+.contact-header {
+    text-align: center;
+    margin-bottom: 55px;
+}
 
+.contact-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(212, 175, 55, 0.12);
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    color: #D4AF37;
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.1);
+}
+
+.contact-title {
+    font-size: 2.6rem;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+.contact-subtitle {
+    color: #a0958a;
+    font-size: 1rem;
+    max-width: 620px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Contact Info Cards Grid */
+.info-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 60px;
+}
+
+@media (max-width: 900px) {
+    .info-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.info-card {
+    background: rgba(22, 18, 14, 0.8);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 16px;
+    padding: 30px 24px;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(212, 175, 55, 0.5);
+    box-shadow: 0 20px 50px rgba(212, 175, 55, 0.15);
+}
+
+.info-card-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 18px;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.05) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #D4AF37;
+    font-size: 1.4rem;
+}
+
+.info-card-title {
+    font-size: 1.1rem;
+    color: #ffffff;
+    font-weight: 500;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+}
+
+.info-card-text {
+    color: #a0958a;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.info-card-text a {
+    color: #D4AF37;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.info-card-text a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+/* Form & Map Section */
+.contact-main-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 36px;
+}
+
+@media (max-width: 950px) {
+    .contact-main-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.contact-card-box {
+    background: rgba(22, 18, 14, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(212, 175, 55, 0.22);
+    border-radius: 18px;
+    padding: 36px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.card-box-title {
+    font-size: 1.4rem;
+    color: #D4AF37;
+    margin-bottom: 24px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Contact Form Controls */
+.contact-form-group {
+    margin-bottom: 20px;
+}
+
+.contact-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #c4b6a8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.contact-input, .contact-textarea {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(12, 10, 8, 0.85);
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.contact-input:focus, .contact-textarea:focus {
+    border-color: #D4AF37;
+    box-shadow: 0 0 18px rgba(212, 175, 55, 0.25);
+}
+
+.contact-btn-submit {
+    width: 100%;
+    padding: 16px 28px;
+    background: linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%);
+    color: #0d0a08;
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: 1px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.contact-btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(212, 175, 55, 0.5);
+    background: linear-gradient(135deg, #E5C158 0%, #C49118 100%);
+}
+
+/* Success Alert Banner */
+.contact-alert-success {
+    background: rgba(34, 197, 94, 0.12);
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    color: #4ade80;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Atelier Hours & Location Detail Box */
+.atelier-detail-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 20px;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.atelier-detail-icon {
+    color: #D4AF37;
+    font-size: 1.2rem;
+    margin-top: 3px;
+}
+
+.atelier-detail-text h4 {
+    font-size: 0.95rem;
+    color: #ffffff;
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+.atelier-detail-text p {
+    font-size: 0.85rem;
+    color: #a0958a;
+    line-height: 1.5;
+}
+</style>
+
+<section class="contact-page">
+    <div class="contact-container">
+        
+        <!-- Header -->
+        <div class="contact-header">
+            <div class="contact-badge">
+                <i class="fa-solid fa-envelope-open-text"></i> Fragrance Concierge
+            </div>
+            <h1 class="contact-title">Contact LINO Atelier</h1>
+            <p class="contact-subtitle">
+                Have an inquiry about our niche olfactory collection, private orders, or bespoke fragrance consultations? Our atelier specialists are ready to assist you.
+            </p>
+        </div>
+
+        <!-- Info Cards Grid -->
+        <div class="info-cards-grid">
+            
+            <!-- Card 1: Concierge & Support -->
+            <div class="info-card">
+                <div class="info-card-icon">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+                <h3 class="info-card-title">Customer Concierge</h3>
+                <div class="info-card-text">
+                    Email: <a href="mailto:support@linoperfumes.com">support@linoperfumes.com</a><br>
+                    Phone: <a href="tel:+919876543210">+91 98765 43210</a><br>
+                    Mon – Sat: 10:00 AM – 8:00 PM IST
+                </div>
+            </div>
+
+            <!-- Card 2: Flagship Boutique -->
+            <div class="info-card">
+                <div class="info-card-icon">
+                    <i class="fa-solid fa-store"></i>
+                </div>
+                <h3 class="info-card-title">Flagship Boutique</h3>
+                <div class="info-card-text">
+                    LINO Luxury Perfumes Atelier<br>
+                    42 Boulevard de Royale, Colaba<br>
+                    Mumbai, Maharashtra 400001, India
+                </div>
+            </div>
+
+            <!-- Card 3: WhatsApp & Social -->
+            <div class="info-card">
+                <div class="info-card-icon">
+                    <i class="fa-brands fa-whatsapp"></i>
+                </div>
+                <h3 class="info-card-title">Instant Consultation</h3>
+                <div class="info-card-text">
+                    Chat with a Fragrance Expert on WhatsApp<br>
+                    <a href="https://wa.me/919876543210" target="_blank" style="display:inline-flex; align-items:center; gap:6px; margin-top:6px; font-weight:600;">
+                        <i class="fa-brands fa-whatsapp" style="font-size:1.1rem; color:#25D366;"></i> Open WhatsApp Chat
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Main Form & Location Grid -->
+        <div class="contact-main-grid">
+            
+            <!-- Left: Contact Form -->
+            <div class="contact-card-box">
+                <h2 class="card-box-title">
+                    <i class="fa-solid fa-paper-plane"></i> Send Us a Message
+                </h2>
+
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="contact-alert-success">
+                        <i class="fa-solid fa-circle-check"></i> {{ message }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="POST" action="{% url 'contact' %}">
+                    {% csrf_token %}
+
+                    <div class="contact-form-group">
+                        <label class="contact-label">Your Full Name <span style="color:#D4AF37;">*</span></label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <div style="color:#ef4444; font-size:0.8rem; margin-top:4px;">{{ form.name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="contact-form-group">
+                        <label class="contact-label">Your Email Address <span style="color:#D4AF37;">*</span></label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                        <div style="color:#ef4444; font-size:0.8rem; margin-top:4px;">{{ form.email.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="contact-form-group">
+                        <label class="contact-label">Subject</label>
+                        {{ form.subject }}
+                        {% if form.subject.errors %}
+                        <div style="color:#ef4444; font-size:0.8rem; margin-top:4px;">{{ form.subject.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="contact-form-group">
+                        <label class="contact-label">Your Message <span style="color:#D4AF37;">*</span></label>
+                        {{ form.message }}
+                        {% if form.message.errors %}
+                        <div style="color:#ef4444; font-size:0.8rem; margin-top:4px;">{{ form.message.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="contact-btn-submit">
+                        Send Message <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Right: Boutique & Visiting Info -->
+            <div class="contact-card-box">
+                <h2 class="card-box-title">
+                    <i class="fa-solid fa-clock"></i> Atelier Visit & Hours
+                </h2>
+
+                <div class="atelier-detail-item">
+                    <div class="atelier-detail-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                    <div class="atelier-detail-text">
+                        <h4>Opening Hours</h4>
+                        <p>Monday – Saturday: 10:00 AM – 8:00 PM IST<br>Sunday: By Private Appointment Only</p>
+                    </div>
+                </div>
+
+                <div class="atelier-detail-item">
+                    <div class="atelier-detail-icon"><i class="fa-solid fa-truck-fast"></i></div>
+                    <div class="atelier-detail-text">
+                        <h4>Order Support & Shipping</h4>
+                        <p>For questions regarding recent orders, tracking numbers, or express shipping inquiries, please mention your Order ID (e.g. #SCN123456).</p>
+                    </div>
+                </div>
+
+                <div class="atelier-detail-item">
+                    <div class="atelier-detail-icon"><i class="fa-solid fa-hand-sparkles"></i></div>
+                    <div class="atelier-detail-text">
+                        <h4>Bespoke Consultations</h4>
+                        <p>Schedule a 1-on-1 private perfume discovery session with our master perfumers at our Colaba atelier.</p>
+                    </div>
+                </div>
+
+                <!-- Styled Map Box -->
+                <div style="margin-top:20px; border-radius:12px; overflow:hidden; border:1px solid rgba(212,175,55,0.25); position:relative;">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3774.2255745494056!2d72.8290!3d18.9220!2m3!1f0!1f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7d1c06d096ddb%3A0x8e83fa2990666060!2sColaba%2C%20Mumbai%2C%20Maharashtra!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin" 
+                        width="100%" 
+                        height="200" 
+                        style="border:0; filter: contrast(1.1) opacity(0.85);" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
 </section>
 
 {% endblock %}
