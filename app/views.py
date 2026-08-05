@@ -307,14 +307,55 @@ class CheckoutView(View):
                 order.total = total_amount
                 order.save()
 
-            is_online_payment = (order.payment_method in ['upi', 'card']) or request.POST.get("is_online_payment") == "true"
+            is_online_payment = (order.payment_method in ['upi', 'card', 'razorpay', 'online']) or request.POST.get("is_online_payment") == "true"
             is_ajax = request.headers.get("x-requested-with") == "XMLHttpRequest" or request.content_type == "application/json"
 
             if is_online_payment:
+                # Prefer creating a Razorpay hosted payment link when enabled
+                use_payment_link = getattr(settings, 'RAZORPAY_USE_PAYMENT_LINK', False)
+                if use_payment_link:
+                    key_id = getattr(settings, 'RAZORPAY_KEY_ID', 'rzp_test_lino_dummy')
+                    key_secret = getattr(settings, 'RAZORPAY_KEY_SECRET', 'lino_dummy_secret')
+                    amount_in_paise = int(total_amount * 100)
+                    payment_link_url = None
+                    if not key_id.startswith('rzp_test_lino_dummy') and key_id and key_secret:
+                        try:
+                            client = razorpay.Client(auth=(key_id, key_secret))
+                            pl = client.payment_link.create({
+                                "amount": amount_in_paise,
+                                "currency": "INR",
+                                "reference_id": order.order_id,
+                                "description": f"Order #{order.order_id}",
+                                "customer": {
+                                    "name": f"{order.first_name} {order.last_name}",
+                                    "email": order.email,
+                                    "contact": order.phone
+                                },
+                                "notify": {"sms": False, "email": False},
+                                "reminder_enable": False,
+                                "notes": {"order_id": order.order_id},
+                                "callback_url": request.build_absolute_uri(reverse('razorpay_verify')),
+                                "callback_method": "get"
+                            })
+                            payment_link_url = pl.get('short_url') or pl.get('long_url') or pl.get('url')
+                        except Exception:
+                            payment_link_url = None
+
+                    if is_ajax:
+                        if payment_link_url:
+                            return JsonResponse({
+                                "status": "RAZORPAY_LINK",
+                                "payment_link_url": payment_link_url
+                            })
+
+                # Dedicated Razorpay Payment Page Flow
                 rzp_data = initiate_razorpay_payment(order, total_amount)
+                payment_page_url = reverse("razorpay_page", kwargs={"order_id": order.order_id})
                 if is_ajax:
                     return JsonResponse({
                         "status": "RAZORPAY_INIT",
+                        "redirect_url": payment_page_url,
+                        "payment_page_url": payment_page_url,
                         "razorpay_key_id": rzp_data["key_id"],
                         "razorpay_order_id": rzp_data["razorpay_order_id"],
                         "amount": rzp_data["amount"],
@@ -324,6 +365,7 @@ class CheckoutView(View):
                         "email": order.email,
                         "phone": order.phone,
                     })
+                return redirect(payment_page_url)
 
             messages.success(request, f"Order {order.order_id} placed successfully!")
             if is_ajax:
@@ -400,6 +442,44 @@ class RazorpayVerifyView(View):
             })
         else:
             return JsonResponse({"status": "ERROR", "message": "Payment signature verification failed"}, status=400)
+
+
+# ==================================================
+# DEDICATED RAZORPAY PAYMENT PAGE
+# ==================================================
+
+class RazorpayPageView(View):
+
+    template_name = "app/razorpay_page.html"
+
+    def get(self, request, order_id):
+        order = get_object_or_404(Order, order_id=order_id)
+
+        # If order is already paid, redirect directly to order success
+        if order.is_paid:
+            messages.info(request, f"Order #{order.order_id} is already paid!")
+            return redirect("order_success")
+
+        # Ensure Razorpay order ID is generated and saved on the Order object
+        if not order.razorpay_order_id:
+            rzp_data = initiate_razorpay_payment(order, order.total)
+            razorpay_order_id = rzp_data["razorpay_order_id"]
+        else:
+            razorpay_order_id = order.razorpay_order_id
+
+        razorpay_key_id = getattr(settings, 'RAZORPAY_KEY_ID', 'rzp_test_lino_dummy')
+        amount_in_paise = int(order.total * 100)
+
+        context = {
+            "order": order,
+            "order_items": order.items.select_related('product').all(),
+            "razorpay_key_id": razorpay_key_id,
+            "razorpay_order_id": razorpay_order_id,
+            "amount_in_paise": amount_in_paise,
+            "total_amount": order.total,
+            "currency": "INR",
+        }
+        return render(request, self.template_name, context)
 
 
 # ==================================================

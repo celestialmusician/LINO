@@ -1,0 +1,703 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Razorpay Payment Gateway | LINO Luxury Perfumes{% endblock %}
+
+{% block content %}
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<style>
+/* ==================================================
+   RAZORPAY PAYMENT GATEWAY - LINO LUXURY STYLING
+   ================================================== */
+.rzp-payment-page {
+    padding: 120px 20px 80px;
+    min-height: 100vh;
+    background: radial-gradient(circle at 50% 20%, #1c1712 0%, #0d0a08 100%);
+    color: #f5f0eb;
+    font-family: 'Inter', sans-serif;
+}
+
+.rzp-payment-container {
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+.rzp-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.rzp-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(212, 175, 55, 0.12);
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    color: #D4AF37;
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.1);
+}
+
+.rzp-title {
+    font-size: 2.2rem;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: #ffffff;
+    margin-bottom: 8px;
+}
+
+.rzp-subtitle {
+    color: #a0958a;
+    font-size: 0.95rem;
+}
+
+.rzp-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: 30px;
+}
+
+@media (max-width: 950px) {
+    .rzp-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Glassmorphic Cards */
+.rzp-card {
+    background: rgba(22, 18, 14, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(212, 175, 55, 0.22);
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+.rzp-card-title {
+    font-size: 1.15rem;
+    color: #D4AF37;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.rzp-order-tag {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ded6ce;
+    font-size: 0.85rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-family: monospace;
+}
+
+/* Item List */
+.rzp-item-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: 6px;
+    margin-bottom: 20px;
+}
+
+.rzp-item-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.rzp-item-list::-webkit-scrollbar-thumb {
+    background: rgba(212, 175, 55, 0.3);
+    border-radius: 4px;
+}
+
+.rzp-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.rzp-item-img {
+    width: 54px;
+    height: 54px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.rzp-item-info {
+    flex: 1;
+}
+
+.rzp-item-name {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: #ffffff;
+    margin-bottom: 3px;
+}
+
+.rzp-item-qty {
+    font-size: 0.8rem;
+    color: #9e9389;
+}
+
+.rzp-item-price {
+    font-weight: 600;
+    color: #D4AF37;
+    font-size: 0.9rem;
+}
+
+/* Shipping Details Summary */
+.rzp-shipping-box {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 15px;
+}
+
+.rzp-shipping-lbl {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #a0958a;
+    margin-bottom: 4px;
+}
+
+.rzp-shipping-val {
+    color: #e5ded7;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* Payment Gateway Tabs */
+.gw-tabs {
+    display: flex;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 6px;
+    border-radius: 12px;
+    border: 1px solid rgba(212, 175, 55, 0.15);
+    margin-bottom: 24px;
+}
+
+.gw-tab {
+    flex: 1;
+    padding: 10px 14px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: #a0958a;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.gw-tab.active {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(212, 175, 55, 0.08) 100%);
+    color: #D4AF37;
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.15);
+}
+
+.gw-tab:hover:not(.active) {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+/* Form Groups & Inputs */
+.gw-form-group {
+    margin-bottom: 18px;
+}
+
+.gw-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #c4b6a8;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.gw-input-wrap {
+    position: relative;
+}
+
+.gw-input {
+    width: 100%;
+    padding: 12px 14px 12px 42px;
+    background: rgba(12, 10, 8, 0.8);
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.gw-input:focus {
+    border-color: #D4AF37;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.25);
+}
+
+.gw-input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #D4AF37;
+    font-size: 0.95rem;
+}
+
+.gw-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+/* Bank Grid */
+.bank-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.bank-card {
+    padding: 12px 8px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.bank-card:hover, .bank-card.selected {
+    border-color: #D4AF37;
+    background: rgba(212, 175, 55, 0.1);
+}
+
+.bank-card i {
+    font-size: 1.2rem;
+    color: #D4AF37;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.bank-card span {
+    font-size: 0.75rem;
+    color: #e5ded7;
+}
+
+/* Pay Button */
+.gw-btn-pay {
+    width: 100%;
+    padding: 16px 28px;
+    background: linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%);
+    color: #0d0a08;
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: 1px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.gw-btn-pay:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(212, 175, 55, 0.5);
+    background: linear-gradient(135deg, #E5C158 0%, #C49118 100%);
+}
+
+/* OTP Modal */
+.otp-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.otp-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.otp-box {
+    background: #14100c;
+    border: 1px solid #D4AF37;
+    border-radius: 16px;
+    padding: 35px 30px;
+    width: 90%;
+    max-width: 420px;
+    text-align: center;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+    position: relative;
+}
+
+.otp-input {
+    width: 100%;
+    padding: 14px;
+    font-size: 1.5rem;
+    letter-spacing: 8px;
+    text-align: center;
+    background: #000;
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    border-radius: 8px;
+    color: #D4AF37;
+    margin: 20px 0;
+    outline: none;
+}
+</style>
+
+<section class="rzp-payment-page">
+    <div class="rzp-payment-container">
+        
+        <!-- Header -->
+        <div class="rzp-header">
+            <div class="rzp-badge">
+                <i class="fa-solid fa-shield-halved"></i> Official Razorpay Gateway
+            </div>
+            <h1 class="rzp-title">Secure Payment Authorization</h1>
+            <p class="rzp-subtitle">Enter your payment details below to complete order #{{ order.order_id }}</p>
+        </div>
+
+        <div class="rzp-grid">
+            
+            <!-- Left Column: Order Summary -->
+            <div class="rzp-card">
+                <div class="rzp-card-title">
+                    <span><i class="fa-solid fa-bag-shopping"></i> Order Breakdown</span>
+                    <span class="rzp-order-tag">#{{ order.order_id }}</span>
+                </div>
+
+                <div class="rzp-item-list">
+                    {% for item in order_items %}
+                    <div class="rzp-item">
+                        {% if item.product.image %}
+                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="rzp-item-img">
+                        {% else %}
+                        <div class="rzp-item-img" style="background:#26201a; display:flex; align-items:center; justify-content:center;">
+                            <i class="fa-solid fa-spray-can" style="color:#D4AF37;"></i>
+                        </div>
+                        {% endif %}
+                        <div class="rzp-item-info">
+                            <div class="rzp-item-name">{{ item.product.name }}</div>
+                            <div class="rzp-item-qty">Qty: {{ item.quantity }} × ₹{{ item.price_at_order|floatformat:2 }}</div>
+                        </div>
+                        <div class="rzp-item-price">
+                            ₹{% widthratio item.price_at_order 1 item.quantity %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="rzp-shipping-box">
+                    <div class="rzp-shipping-lbl"><i class="fa-solid fa-user"></i> Customer Info</div>
+                    <div class="rzp-shipping-val">
+                        <strong>{{ order.first_name }} {{ order.last_name }}</strong><br>
+                        {{ order.email }} | {{ order.phone }}
+                    </div>
+                </div>
+
+                <div class="rzp-shipping-box">
+                    <div class="rzp-shipping-lbl"><i class="fa-solid fa-location-dot"></i> Delivery Address</div>
+                    <div class="rzp-shipping-val">
+                        {{ order.address }}, {{ order.city }}, {{ order.state }} - {{ order.pincode }}
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; padding-top:10px; border-top:1px dashed rgba(212,175,55,0.2);">
+                    <span style="color:#a0958a; font-size:0.9rem;">Total Amount:</span>
+                    <span style="color:#D4AF37; font-size:1.5rem; font-weight:700;">₹{{ total_amount|floatformat:2 }}</span>
+                </div>
+            </div>
+
+            <!-- Right Column: Interactive Payment Gateway -->
+            <div class="rzp-card">
+                <div class="rzp-card-title">
+                    <span><i class="fa-solid fa-credit-card"></i> Select Payment Method</span>
+                    <span style="font-size:0.8rem; color:#8c8278;"><i class="fa-solid fa-lock"></i> 256-Bit SSL</span>
+                </div>
+
+                <!-- Gateway Method Tabs -->
+                <div class="gw-tabs">
+                    <button class="gw-tab active" data-target="tabCard">
+                        <i class="fa-solid fa-credit-card"></i> Card
+                    </button>
+                    <button class="gw-tab" data-target="tabUpi">
+                        <i class="fa-solid fa-mobile-screen-button"></i> UPI / QR
+                    </button>
+                    <button class="gw-tab" data-target="tabNet">
+                        <i class="fa-solid fa-building-columns"></i> Netbanking
+                    </button>
+                </div>
+
+                <form id="gwPaymentForm">
+                    <!-- Tab 1: Credit / Debit Card -->
+                    <div id="tabCard" class="gw-tab-content">
+                        <div class="gw-form-group">
+                            <label class="gw-label">Card Number</label>
+                            <div class="gw-input-wrap">
+                                <i class="fa-solid fa-credit-card gw-input-icon" id="cardBrandIcon"></i>
+                                <input type="text" id="cardNumber" class="gw-input" placeholder="4532 •••• •••• ••••" maxlength="19" required>
+                            </div>
+                        </div>
+
+                        <div class="gw-row-2">
+                            <div class="gw-form-group">
+                                <label class="gw-label">Expiry Date</label>
+                                <div class="gw-input-wrap">
+                                    <i class="fa-solid fa-calendar-days gw-input-icon"></i>
+                                    <input type="text" id="cardExpiry" class="gw-input" placeholder="MM / YY" maxlength="5" required>
+                                </div>
+                            </div>
+                            <div class="gw-form-group">
+                                <label class="gw-label">CVV / CVC</label>
+                                <div class="gw-input-wrap">
+                                    <i class="fa-solid fa-key gw-input-icon"></i>
+                                    <input type="password" id="cardCvv" class="gw-input" placeholder="123" maxlength="4" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="gw-form-group">
+                            <label class="gw-label">Cardholder Name</label>
+                            <div class="gw-input-wrap">
+                                <i class="fa-solid fa-user gw-input-icon"></i>
+                                <input type="text" id="cardName" class="gw-input" value="{{ order.first_name }} {{ order.last_name }}" placeholder="Name on Card" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: UPI / QR Code -->
+                    <div id="tabUpi" class="gw-tab-content" style="display:none;">
+                        <div class="gw-form-group">
+                            <label class="gw-label">Enter UPI ID / VPA</label>
+                            <div class="gw-input-wrap">
+                                <i class="fa-solid fa-at gw-input-icon"></i>
+                                <input type="text" id="upiId" class="gw-input" placeholder="mobile@upi / username@okicici">
+                            </div>
+                        </div>
+
+                        <div style="text-align:center; margin:20px 0;">
+                            <span style="font-size:0.8rem; color:#8c8278; display:block; margin-bottom:12px;">Or Scan QR Code via GPay, PhonePe, Paytm</span>
+                            <div style="background:#fff; padding:12px; display:inline-block; border-radius:10px; border:2px solid #D4AF37;">
+                                <i class="fa-solid fa-qrcode" style="font-size:100px; color:#000;"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Netbanking -->
+                    <div id="tabNet" class="gw-tab-content" style="display:none;">
+                        <label class="gw-label" style="margin-bottom:12px;">Popular Indian Banks</label>
+                        <div class="bank-grid">
+                            <div class="bank-card selected"><i class="fa-solid fa-building-columns"></i><span>HDFC</span></div>
+                            <div class="bank-card"><i class="fa-solid fa-building-columns"></i><span>ICICI</span></div>
+                            <div class="bank-card"><i class="fa-solid fa-building-columns"></i><span>SBI</span></div>
+                            <div class="bank-card"><i class="fa-solid fa-building-columns"></i><span>AXIS</span></div>
+                            <div class="bank-card"><i class="fa-solid fa-building-columns"></i><span>KOTAK</span></div>
+                            <div class="bank-card"><i class="fa-solid fa-building-columns"></i><span>PNB</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <button type="submit" id="submitGwBtn" class="gw-btn-pay">
+                        <i class="fa-solid fa-lock"></i> Pay ₹{{ total_amount|floatformat:2 }} Securely
+                    </button>
+                </form>
+
+                <div style="text-align:center; margin-top:15px;">
+                    <a href="{% url 'checkout' %}" style="color:#a0958a; font-size:0.85rem; text-decoration:none;">
+                        <i class="fa-solid fa-arrow-left"></i> Cancel & Return to Checkout
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- 3D Luxury Razorpay OTP Verification Modal -->
+<div class="otp-overlay" id="otpModal">
+    <div class="otp-box">
+        <div style="font-size:2rem; color:#D4AF37; margin-bottom:8px;"><i class="fa-solid fa-shield-halved"></i></div>
+        <h3 style="color:#fff; font-size:1.3rem; margin-bottom:6px;">Razorpay OTP Verification</h3>
+        <p style="color:#a0958a; font-size:0.85rem;">Enter 6-digit OTP sent to registered mobile for Order #{{ order.order_id }}</p>
+        
+        <input type="text" id="otpInput" class="otp-input" maxlength="6" value="123456" placeholder="••••••">
+        
+        <button id="verifyOtpBtn" class="gw-btn-pay" style="margin-top:0;">
+            <i class="fa-solid fa-circle-check"></i> Authorize & Complete Payment
+        </button>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Tab Switcher
+    const tabs = document.querySelectorAll(".gw-tab");
+    const contents = document.querySelectorAll(".gw-tab-content");
+
+    tabs.forEach(tab => {
+        tab.addEventListener("click", (e) => {
+            e.preventDefault();
+            tabs.forEach(t => t.classList.remove("active"));
+            contents.forEach(c => c.style.display = "none");
+
+            tab.classList.add("active");
+            const targetId = tab.dataset.target;
+            document.getElementById(targetId).style.display = "block";
+        });
+    });
+
+    // Card Input Auto-formatting
+    const cardInput = document.getElementById("cardNumber");
+    if (cardInput) {
+        cardInput.addEventListener("input", (e) => {
+            let val = e.target.value.replace(/\D/g, "");
+            val = val.replace(/(.{4})/g, "$1 ").trim();
+            e.target.value = val;
+        });
+    }
+
+    const expiryInput = document.getElementById("cardExpiry");
+    if (expiryInput) {
+        expiryInput.addEventListener("input", (e) => {
+            let val = e.target.value.replace(/\D/g, "");
+            if (val.length >= 2) {
+                val = val.substring(0,2) + " / " + val.substring(2,4);
+            }
+            e.target.value = val;
+        });
+    }
+
+    // Form Submission
+    const gwForm = document.getElementById("gwPaymentForm");
+    const submitBtn = document.getElementById("submitGwBtn");
+    const otpModal = document.getElementById("otpModal");
+    const verifyOtpBtn = document.getElementById("verifyOtpBtn");
+
+    const rzpKeyId = "{{ razorpay_key_id }}";
+    const rzpOrderId = "{{ razorpay_order_id }}";
+    const orderId = "{{ order.order_id }}";
+
+    gwForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing Request...';
+        }
+
+        if (typeof Razorpay !== "undefined" && !rzpKeyId.startsWith("rzp_test_lino_dummy")) {
+            // Live Razorpay SDK execution
+            const options = {
+                "key": rzpKeyId,
+                "amount": {{ amount_in_paise }},
+                "currency": "INR",
+                "name": "LINO Luxury Perfumes",
+                "description": `Order #${orderId}`,
+                "order_id": rzpOrderId,
+                "handler": function (response) {
+                    verifyPaymentPayload(response.razorpay_order_id, response.razorpay_payment_id, response.razorpay_signature);
+                },
+                "prefill": {
+                    "name": "{{ order.first_name }} {{ order.last_name }}",
+                    "email": "{{ order.email }}",
+                    "contact": "{{ order.phone }}"
+                },
+                "theme": { "color": "#D4AF37" }
+            };
+            const rzp = new Razorpay(options);
+            rzp.open();
+        } else {
+            // Interactive OTP Modal for Sandbox / Test Simulation
+            setTimeout(() => {
+                otpModal.classList.add("active");
+            }, 600);
+        }
+    });
+
+    if (verifyOtpBtn) {
+        verifyOtpBtn.addEventListener("click", function() {
+            verifyOtpBtn.disabled = true;
+            verifyOtpBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
+
+            verifyPaymentPayload(rzpOrderId, `pay_simulated_${orderId}`, `sig_simulated_${orderId}`);
+        });
+    }
+
+    function verifyPaymentPayload(rzpOrderIdVal, rzpPaymentIdVal, rzpSignatureVal) {
+        fetch("{% url 'razorpay_verify' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-Requested-With": "XMLHttpRequest"
+            },
+            body: new URLSearchParams({
+                "razorpay_order_id": rzpOrderIdVal || rzpOrderId,
+                "razorpay_payment_id": rzpPaymentIdVal || `pay_dummy_${orderId}`,
+                "razorpay_signature": rzpSignatureVal || "dummy_signature_ok"
+            })
+        })
+        .then(res => res.json())
+        .then(verRes => {
+            if (verRes.status === "SUCCESS") {
+                localStorage.removeItem("cart");
+                window.location.href = verRes.redirect_url;
+            } else {
+                alert("Payment Verification Failed: " + (verRes.message || "Invalid Details"));
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Retry Secure Payment';
+                }
+            }
+        })
+        .catch(err => {
+            alert("Verification Error: " + err);
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Retry Secure Payment';
+            }
+        });
+    }
+});
+</script>
+
+{% endblock %}

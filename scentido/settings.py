@@ -27,7 +27,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-d5@lzd9nrrbd17&5ev9-%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost,.onrender.com,lino-perfume.onrender.com', cast=lambda v: [s.strip() for s in v.split(',') if s.strip()])
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost,testserver,.onrender.com,lino-perfume.onrender.com,*', cast=lambda v: [s.strip() for s in v.split(',') if s.strip()])
 
 # Security & Cookie Hardening
 SECURE_BROWSER_XSS_FILTER = True

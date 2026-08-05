@@ -30,4 +30,14 @@
 
 </section>
 
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    localStorage.removeItem("cart");
+    sessionStorage.removeItem("clearCartOnLoad");
+    if (typeof updateCartCount === "function") {
+        updateCartCount();
+    }
+});
+</script>
+
 {% endblock %}

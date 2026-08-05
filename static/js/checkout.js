@@ -204,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 cartDataInput.value = JSON.stringify(cart);
             }
 
-            if (paymentMethod === "upi" || paymentMethod === "card") {
+            if (["upi", "card", "razorpay", "online"].includes(paymentMethod)) {
                 e.preventDefault();
 
                 const submitBtn = document.getElementById("placeOrderBtn");
@@ -225,7 +225,29 @@ document.addEventListener("DOMContentLoaded", () => {
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.status === "RAZORPAY_INIT") {
+                    if (data.status === "REQUIRE_AUTH") {
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = "Place Order";
+                        }
+                        if (typeof window.openAuthModal === "function") {
+                            window.openAuthModal("checkout", "/checkout/");
+                        } else {
+                            window.location.href = "/login/?next=/checkout/";
+                        }
+                        return;
+                    }
+
+                    if (data.status === "RAZORPAY_LINK" && data.payment_link_url) {
+                        localStorage.removeItem("cart");
+                        window.location.href = data.payment_link_url;
+                        return;
+                    }
+
+                    if (data.redirect_url || data.payment_page_url) {
+                        localStorage.removeItem("cart");
+                        window.location.href = data.redirect_url || data.payment_page_url;
+                    } else if (data.status === "RAZORPAY_INIT") {
                         openRazorpayModal(data, submitBtn);
                     } else if (data.status === "SUCCESS") {
                         localStorage.removeItem("cart");

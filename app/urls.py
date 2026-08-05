@@ -64,6 +64,12 @@ urlpatterns = [
     ),
 
     path(
+        "payment/<str:order_id>/",
+        views.RazorpayPageView.as_view(),
+        name="razorpay_page",
+    ),
+
+    path(
         "order-success/",
         views.OrderSuccessView.as_view(),
         name="order_success",
