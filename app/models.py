@@ -465,4 +465,38 @@ class Review(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.product.name} - {self.rating}★ by {self.reviewer_name}"
+        return f"{self.product.name} - {self.rating} Stars by {self.reviewer_name}"
+
+
+# ==================================================
+# PASSWORD RESET OTP
+# ==================================================
+
+class PasswordResetOTP(models.Model):
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="otp_resets"
+    )
+
+    otp_code = models.CharField(
+        max_length=6
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    is_used = models.BooleanField(
+        default=False
+    )
+
+    def is_valid(self):
+        from django.utils import timezone
+        import datetime
+        now = timezone.now()
+        return not self.is_used and (now - self.created_at) < datetime.timedelta(minutes=10)
+
+    def __str__(self):
+        return f"{self.user.email} - OTP: {self.otp_code}"

@@ -1,4 +1,5 @@
 import json
+import random
 import razorpay
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
@@ -17,10 +18,10 @@ from django.utils.decorators import method_decorator
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.urls import reverse
 
-from .models import Product, Order, OrderItem, Review, Category
+from .models import Product, Order, OrderItem, Review, Category, PasswordResetOTP
 from .forms import (
     UserRegisterForm, UserLoginForm, UserProfileForm, CheckoutForm, ContactForm, ReviewForm,
-    ForgotPasswordForm, ResetPasswordConfirmForm, ChangePasswordForm
+    ForgotPasswordForm, ResetPasswordConfirmForm, ChangePasswordForm, VerifyOTPForm
 )
 
 
@@ -696,7 +697,7 @@ class LogoutView(View):
 
 
 # ==================================================
-# FORGOT & RESET PASSWORD VIEWS
+# FORGOT & LIVE OTP PASSWORD RESET VIEWS
 # ==================================================
 
 class ForgotPasswordView(View):
@@ -712,38 +713,174 @@ class ForgotPasswordView(View):
         form = ForgotPasswordForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email'].strip().lower()
-            users = User.objects.filter(email__iexact=email)
+            try:
+                user = User.objects.get(email__iexact=email)
+            except User.DoesNotExist:
+                user = None
 
-            reset_link = None
-            if users.exists():
-                for user in users:
-                    token = default_token_generator.make_token(user)
-                    uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
-                    reset_link = request.build_absolute_uri(
-                        reverse('reset_password_confirm', kwargs={'uidb64': uidb64, 'token': token})
+            if user:
+                # Generate 6-digit OTP code
+                otp_code = str(random.randint(100000, 999999))
+                PasswordResetOTP.objects.create(user=user, otp_code=otp_code)
+
+                request.session['reset_email'] = email
+                request.session['latest_otp'] = otp_code
+
+                subject = "LINO • Your 6-Digit Password Reset OTP"
+                message = f"Hello {user.get_full_name() or user.username},\n\nYour One-Time Password (OTP) to reset your LINO account password is:\n\n{otp_code}\n\nThis OTP is valid for 10 minutes. Please do not share this code with anyone.\n\nWarm regards,\nLINO Atelier Team"
+                try:
+                    send_mail(
+                        subject,
+                        message,
+                        getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@lino.com'),
+                        [user.email],
+                        fail_silently=True,
                     )
-                    
-                    subject = "LINO • Reset Your Password"
-                    message = f"Hello {user.get_full_name() or user.username},\n\nYou requested a password reset for your LINO account. Please click the link below to set a new password:\n\n{reset_link}\n\nIf you did not request this change, please ignore this email.\n\nWarm regards,\nLINO Atelier Team"
-                    try:
-                        send_mail(
-                            subject,
-                            message,
-                            getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@lino.com'),
-                            [user.email],
-                            fail_silently=True,
-                        )
-                    except Exception:
-                        pass
-                
-            messages.success(request, "If an account exists with that email address, password reset instructions have been generated.")
-            return render(request, self.template_name, {
-                "form": ForgotPasswordForm(),
-                "submitted": True,
-                "reset_link_dev": reset_link
-            })
+                except Exception:
+                    pass
+
+                messages.success(request, f"A 6-digit OTP code has been sent to {email}.")
+                return redirect("verify_otp")
+
+            messages.error(request, "No registered account was found with that email address.")
+            return render(request, self.template_name, {"form": form})
 
         return render(request, self.template_name, {"form": form})
+
+
+class VerifyOTPView(View):
+    template_name = "app/verify_otp.html"
+
+    def get(self, request):
+        email = request.session.get('reset_email')
+        if not email:
+            messages.error(request, "Please enter your email to request a password reset OTP.")
+            return redirect("forgot_password")
+        form = VerifyOTPForm()
+        latest_otp = request.session.get('latest_otp')
+        return render(request, self.template_name, {
+            "form": form,
+            "email": email,
+            "latest_otp": latest_otp
+        })
+
+    def post(self, request):
+        email = request.session.get('reset_email')
+        if not email:
+            messages.error(request, "Session expired. Please request a new OTP.")
+            return redirect("forgot_password")
+
+        form = VerifyOTPForm(request.POST)
+        if form.is_valid():
+            otp_entered = form.cleaned_data['otp_code']
+            try:
+                user = User.objects.get(email__iexact=email)
+                valid_otps = PasswordResetOTP.objects.filter(
+                    user=user,
+                    otp_code=otp_entered,
+                    is_used=False
+                ).order_by('-created_at')
+                
+                # Check if valid
+                matching_otp = None
+                for otp_obj in valid_otps:
+                    if otp_obj.is_valid():
+                        matching_otp = otp_obj
+                        break
+
+                if matching_otp:
+                    matching_otp.is_used = True
+                    matching_otp.save()
+                    request.session['otp_verified_user_id'] = user.id
+                    messages.success(request, "OTP verified successfully! Please enter your new password.")
+                    return redirect("set_new_password")
+                else:
+                    messages.error(request, "Invalid or expired OTP code. Please check and try again.")
+            except User.DoesNotExist:
+                messages.error(request, "Account not found. Please restart the reset process.")
+                return redirect("forgot_password")
+
+        latest_otp = request.session.get('latest_otp')
+        return render(request, self.template_name, {
+            "form": form,
+            "email": email,
+            "latest_otp": latest_otp
+        })
+
+
+class ResendOTPView(View):
+
+    def get(self, request):
+        email = request.session.get('reset_email')
+        if not email:
+            messages.error(request, "Session expired. Please request a new OTP.")
+            return redirect("forgot_password")
+
+        try:
+            user = User.objects.get(email__iexact=email)
+            otp_code = str(random.randint(100000, 999999))
+            PasswordResetOTP.objects.create(user=user, otp_code=otp_code)
+            request.session['latest_otp'] = otp_code
+
+            subject = "LINO • Resent Password Reset OTP"
+            message = f"Hello {user.get_full_name() or user.username},\n\nYour new 6-digit OTP to reset your password is:\n\n{otp_code}\n\nThis OTP is valid for 10 minutes.\n\nWarm regards,\nLINO Atelier Team"
+            try:
+                send_mail(
+                    subject,
+                    message,
+                    getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@lino.com'),
+                    [user.email],
+                    fail_silently=True,
+                )
+            except Exception:
+                pass
+
+            messages.success(request, f"A new 6-digit OTP code has been sent to {email}.")
+        except User.DoesNotExist:
+            messages.error(request, "User not found.")
+
+        return redirect("verify_otp")
+
+
+class SetNewPasswordView(View):
+    template_name = "app/reset_password_confirm.html"
+
+    def get(self, request):
+        user_id = request.session.get('otp_verified_user_id')
+        if not user_id:
+            messages.error(request, "OTP verification required first.")
+            return redirect("forgot_password")
+
+        form = ResetPasswordConfirmForm()
+        return render(request, self.template_name, {"form": form, "validlink": True})
+
+    def post(self, request):
+        user_id = request.session.get('otp_verified_user_id')
+        if not user_id:
+            messages.error(request, "Session expired. Please restart password reset.")
+            return redirect("forgot_password")
+
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            messages.error(request, "User not found.")
+            return redirect("forgot_password")
+
+        form = ResetPasswordConfirmForm(request.POST)
+        if form.is_valid():
+            new_password = form.cleaned_data['new_password']
+            user.set_password(new_password)
+            user.save()
+
+            # Clean up session keys
+            request.session.pop('reset_email', None)
+            request.session.pop('latest_otp', None)
+            request.session.pop('otp_verified_user_id', None)
+
+            messages.success(request, "Your password has been successfully updated! Please sign in with your new password.")
+            return redirect("login")
+
+        return render(request, self.template_name, {"form": form, "validlink": True})
 
 
 class ResetPasswordConfirmView(View):

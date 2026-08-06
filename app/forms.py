@@ -258,6 +258,32 @@ class ForgotPasswordForm(forms.Form):
 
 
 # ==================================================
+# VERIFY OTP FORM
+# ==================================================
+
+class VerifyOTPForm(forms.Form):
+
+    otp_code = forms.CharField(
+        max_length=6,
+        min_length=6,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Enter 6-digit OTP',
+            'required': True,
+            'maxlength': '6',
+            'autocomplete': 'off',
+            'pattern': '[0-9]{6}',
+        })
+    )
+
+    def clean_otp_code(self):
+        otp = self.cleaned_data.get('otp_code', '').strip()
+        if not otp.isdigit() or len(otp) != 6:
+            raise ValidationError("Please enter a valid 6-digit numeric OTP.")
+        return otp
+
+
+# ==================================================
 # RESET PASSWORD CONFIRM FORM
 # ==================================================
 

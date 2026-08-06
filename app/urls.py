@@ -112,6 +112,24 @@ urlpatterns = [
     ),
 
     path(
+        "verify-otp/",
+        views.VerifyOTPView.as_view(),
+        name="verify_otp",
+    ),
+
+    path(
+        "resend-otp/",
+        views.ResendOTPView.as_view(),
+        name="resend_otp",
+    ),
+
+    path(
+        "set-new-password/",
+        views.SetNewPasswordView.as_view(),
+        name="set_new_password",
+    ),
+
+    path(
         "reset-password/<str:uidb64>/<str:token>/",
         views.ResetPasswordConfirmView.as_view(),
         name="reset_password_confirm",
