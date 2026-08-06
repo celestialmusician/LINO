@@ -136,9 +136,6 @@ def reset_products():
     media_dir = os.path.join(base_dir, "media", "products")
     os.makedirs(media_dir, exist_ok=True)
 
-    print("Cleaning up old products...")
-    Product.objects.all().delete()
-
     # Ensure 4 standard categories exist
     categories = {}
     for cat_name in ["Attar", "Bahoor", "Burner", "Perfumes"]:
@@ -149,34 +146,37 @@ def reset_products():
         cat_obj = categories.get(item["category_name"], categories["Perfumes"])
         src_path = os.path.join(static_images_dir, item["filename"])
         
-        product = Product(
-            name=item["name"],
-            category=cat_obj,
-            price=item["price"],
-            subtitle=item["subtitle"],
-            description=item["description"],
-            story=item["story"],
-            volume=item["volume"],
-            concentration=item["concentration"],
-            longevity=item["longevity"],
-            top_notes=item["top_notes"],
-            heart_notes=item["heart_notes"],
-            base_notes=item["base_notes"],
-            featured=item["featured"],
-            stock=item["stock"],
-            is_active=True,
-        )
+        # Avoid wiping DB on every deploy if products already exist
+        if not Product.objects.filter(name__iexact=item["name"]).exists():
+            product = Product(
+                name=item["name"],
+                category=cat_obj,
+                price=item["price"],
+                subtitle=item["subtitle"],
+                description=item["description"],
+                story=item["story"],
+                volume=item["volume"],
+                concentration=item["concentration"],
+                longevity=item["longevity"],
+                top_notes=item["top_notes"],
+                heart_notes=item["heart_notes"],
+                base_notes=item["base_notes"],
+                featured=item["featured"],
+                stock=item["stock"],
+                is_active=True,
+            )
 
-        if os.path.exists(src_path):
-            with open(src_path, "rb") as f:
-                # Save with clean filename into media/products/
-                clean_filename = item["filename"].replace(" ", "_")
-                product.image.save(clean_filename, File(f), save=False)
-        
-        product.save()
-        print(f"  [+] Reset & synced: {product.name} ({product.category.name}) -> {product.image.name}")
+            if os.path.exists(src_path):
+                with open(src_path, "rb") as f:
+                    clean_filename = item["filename"].replace(" ", "_")
+                    product.image.save(clean_filename, File(f), save=False)
+            
+            product.save()
+            print(f"  [+] Synced missing product: {product.name}")
+        else:
+            print(f"  [=] Product exists: {item['name']}")
 
-    print("\n[OK] Product reset complete! Total Products:", Product.objects.count())
+    print("\n[OK] Product sync complete! Total Products:", Product.objects.count())
 
 if __name__ == "__main__":
     reset_products()
