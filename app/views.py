@@ -3,9 +3,13 @@ import razorpay
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.core.mail import send_mail
 from django.contrib import messages
 from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
@@ -14,7 +18,10 @@ from django.http import JsonResponse, HttpResponseBadRequest
 from django.urls import reverse
 
 from .models import Product, Order, OrderItem, Review, Category
-from .forms import UserRegisterForm, UserLoginForm, UserProfileForm, CheckoutForm, ContactForm, ReviewForm
+from .forms import (
+    UserRegisterForm, UserLoginForm, UserProfileForm, CheckoutForm, ContactForm, ReviewForm,
+    ForgotPasswordForm, ResetPasswordConfirmForm, ChangePasswordForm
+)
 
 
 def initiate_razorpay_payment(order, total_amount):
@@ -686,3 +693,120 @@ class LogoutView(View):
     def get(self, request):
         logout(request)
         return redirect("home")
+
+
+# ==================================================
+# FORGOT & RESET PASSWORD VIEWS
+# ==================================================
+
+class ForgotPasswordView(View):
+    template_name = "app/forgot_password.html"
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            return redirect("home")
+        form = ForgotPasswordForm()
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request):
+        form = ForgotPasswordForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email'].strip().lower()
+            users = User.objects.filter(email__iexact=email)
+
+            reset_link = None
+            if users.exists():
+                for user in users:
+                    token = default_token_generator.make_token(user)
+                    uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+                    reset_link = request.build_absolute_uri(
+                        reverse('reset_password_confirm', kwargs={'uidb64': uidb64, 'token': token})
+                    )
+                    
+                    subject = "LINO • Reset Your Password"
+                    message = f"Hello {user.get_full_name() or user.username},\n\nYou requested a password reset for your LINO account. Please click the link below to set a new password:\n\n{reset_link}\n\nIf you did not request this change, please ignore this email.\n\nWarm regards,\nLINO Atelier Team"
+                    try:
+                        send_mail(
+                            subject,
+                            message,
+                            getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@lino.com'),
+                            [user.email],
+                            fail_silently=True,
+                        )
+                    except Exception:
+                        pass
+                
+            messages.success(request, "If an account exists with that email address, password reset instructions have been generated.")
+            return render(request, self.template_name, {
+                "form": ForgotPasswordForm(),
+                "submitted": True,
+                "reset_link_dev": reset_link
+            })
+
+        return render(request, self.template_name, {"form": form})
+
+
+class ResetPasswordConfirmView(View):
+    template_name = "app/reset_password_confirm.html"
+
+    def get(self, request, uidb64, token):
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        if user is not None and default_token_generator.check_token(user, token):
+            form = ResetPasswordConfirmForm()
+            return render(request, self.template_name, {"form": form, "validlink": True})
+        else:
+            return render(request, self.template_name, {"validlink": False})
+
+    def post(self, request, uidb64, token):
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        if user is not None and default_token_generator.check_token(user, token):
+            form = ResetPasswordConfirmForm(request.POST)
+            if form.is_valid():
+                new_password = form.cleaned_data['new_password']
+                user.set_password(new_password)
+                user.save()
+                messages.success(request, "Your password has been successfully reset! You can now sign in with your new password.")
+                return redirect("login")
+            return render(request, self.template_name, {"form": form, "validlink": True})
+        else:
+            return render(request, self.template_name, {"validlink": False})
+
+
+class ChangePasswordView(LoginRequiredMixin, View):
+    login_url = "/login/"
+
+    def post(self, request):
+        form = ChangePasswordForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            new_password = form.cleaned_data['new_password']
+            request.user.set_password(new_password)
+            request.user.save()
+            update_session_auth_hash(request, request.user)
+            messages.success(request, "Your password has been changed successfully!")
+            return redirect("profile")
+        else:
+            orders = Order.objects.filter(user=request.user).order_by("-created_at")
+            profile_form = UserProfileForm(initial={
+                'full_name': request.user.get_full_name() or request.user.username,
+                'email': request.user.email,
+            })
+            return render(
+                request,
+                "app/profile.html",
+                {
+                    "orders": orders,
+                    "order_count": orders.count(),
+                    "form": profile_form,
+                    "password_form": form,
+                }
+            )

@@ -240,3 +240,104 @@ class ReviewForm(forms.ModelForm):
             'headline': forms.TextInput(attrs={'placeholder': 'Review Title (e.g. Magnificent scent)'}),
             'comment': forms.Textarea(attrs={'placeholder': 'Share your experience with this perfume...', 'rows': 4, 'required': True}),
         }
+
+
+# ==================================================
+# FORGOT PASSWORD FORM
+# ==================================================
+
+class ForgotPasswordForm(forms.Form):
+
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'placeholder': 'Enter your registered email address',
+            'required': True,
+        })
+    )
+
+
+# ==================================================
+# RESET PASSWORD CONFIRM FORM
+# ==================================================
+
+class ResetPasswordConfirmForm(forms.Form):
+
+    new_password = forms.CharField(
+        min_length=8,
+        required=True,
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'New Password (min 8 characters)',
+            'required': True,
+        })
+    )
+
+    confirm_password = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'Confirm New Password',
+            'required': True,
+        })
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get('new_password')
+        confirm = cleaned_data.get('confirm_password')
+
+        if password and confirm and password != confirm:
+            self.add_error('confirm_password', "Passwords do not match.")
+
+        return cleaned_data
+
+
+# ==================================================
+# CHANGE PASSWORD FORM (LOGGED-IN USER)
+# ==================================================
+
+class ChangePasswordForm(forms.Form):
+
+    old_password = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'Current Password',
+            'required': True,
+        })
+    )
+
+    new_password = forms.CharField(
+        min_length=8,
+        required=True,
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'New Password (min 8 characters)',
+            'required': True,
+        })
+    )
+
+    confirm_password = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'Confirm New Password',
+            'required': True,
+        })
+    )
+
+    def __init__(self, user=None, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    def clean_old_password(self):
+        old_pass = self.cleaned_data.get('old_password')
+        if self.user and not self.user.check_password(old_pass):
+            raise ValidationError("Incorrect current password.")
+        return old_pass
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_pass = cleaned_data.get('new_password')
+        confirm = cleaned_data.get('confirm_password')
+
+        if new_pass and confirm and new_pass != confirm:
+            self.add_error('confirm_password', "New passwords do not match.")
+
+        return cleaned_data

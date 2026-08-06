@@ -105,4 +105,22 @@ urlpatterns = [
         name="my_orders",
     ),
 
+    path(
+        "forgot-password/",
+        views.ForgotPasswordView.as_view(),
+        name="forgot_password",
+    ),
+
+    path(
+        "reset-password/<str:uidb64>/<str:token>/",
+        views.ResetPasswordConfirmView.as_view(),
+        name="reset_password_confirm",
+    ),
+
+    path(
+        "change-password/",
+        views.ChangePasswordView.as_view(),
+        name="change_password",
+    ),
+
 ]

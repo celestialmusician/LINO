@@ -148,6 +148,44 @@
                 </form>
             </div>
 
+            <!-- Change Password Card -->
+            <div class="dash-box" style="margin-top: 24px;">
+                <h3 style="font-size: 20px; color: #111; margin-bottom: 8px;">Security & Password</h3>
+                <p style="color: #666; font-size: 13px; margin-bottom: 20px;">Update your password to keep your account secure.</p>
+                <form method="POST" action="{% url 'change_password' %}">
+                    {% csrf_token %}
+                    
+                    {% if password_form.old_password.errors %}
+                    <div style="color: #dc2626; font-size: 12px; margin-bottom: 6px;">{{ password_form.old_password.errors.0 }}</div>
+                    {% endif %}
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #666; margin-bottom: 6px;">Current Password</label>
+                        <input type="password" name="old_password" placeholder="Enter current password" required style="width: 100%; height: 46px; padding: 0 16px; border: 1px solid #e0e0dc; border-radius: 12px; font-size: 14px; box-sizing: border-box;">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                        <div>
+                            {% if password_form.new_password.errors %}
+                            <div style="color: #dc2626; font-size: 12px; margin-bottom: 6px;">{{ password_form.new_password.errors.0 }}</div>
+                            {% endif %}
+                            <label style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #666; margin-bottom: 6px;">New Password</label>
+                            <input type="password" name="new_password" placeholder="Min 8 characters" required style="width: 100%; height: 46px; padding: 0 16px; border: 1px solid #e0e0dc; border-radius: 12px; font-size: 14px; box-sizing: border-box;">
+                        </div>
+                        <div>
+                            {% if password_form.confirm_password.errors %}
+                            <div style="color: #dc2626; font-size: 12px; margin-bottom: 6px;">{{ password_form.confirm_password.errors.0 }}</div>
+                            {% endif %}
+                            <label style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #666; margin-bottom: 6px;">Confirm New Password</label>
+                            <input type="password" name="confirm_password" placeholder="Re-enter new password" required style="width: 100%; height: 46px; padding: 0 16px; border: 1px solid #e0e0dc; border-radius: 12px; font-size: 14px; box-sizing: border-box;">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="background: #b8955a; color: #fff; border: none; padding: 12px 28px; border-radius: 999px; font-weight: 600; cursor: pointer; transition: 0.3s;">
+                        Update Password
+                    </button>
+                </form>
+            </div>
+
         </div>
 
     </div>
