@@ -212,22 +212,12 @@ class Product(models.Model):
                 if item.image and hasattr(item.image, 'url'):
                     try:
                         url = item.image.url
-                        if url not in images:
+                        if url and url not in images:
                             images.append(url)
                     except Exception:
                         pass
         except Exception:
             pass
-
-        if len(images) <= 1:
-            try:
-                others = Product.objects.exclude(id=self.id)[:3]
-                for p in others:
-                    p_url = p.get_image_url
-                    if p_url and p_url not in images:
-                        images.append(p_url)
-            except Exception:
-                pass
 
         return images
 

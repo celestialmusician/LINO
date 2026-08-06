@@ -174,23 +174,7 @@ def reset_products():
                 product.image.save(clean_filename, File(f), save=False)
         
         product.save()
-        
-        # Attach gallery images from other perfume photos to provide multi-angle previews
-        all_static_files = [f for f in os.listdir(static_images_dir) if f.endswith(".png")]
-        gallery_files = [f for f in all_static_files if f != item["filename"]]
-        
-        # Clear existing gallery for this product
-        ProductImage.objects.filter(product=product).delete()
-        
-        for idx, g_file in enumerate(gallery_files[:3]):
-            g_path = os.path.join(static_images_dir, g_file)
-            if os.path.exists(g_path):
-                g_obj = ProductImage(product=product, alt_text=f"{product.name} view {idx+2}", ordering=idx+1)
-                with open(g_path, "rb") as gf:
-                    g_obj.image.save(f"gallery_{product.slug}_{g_file}", File(gf), save=False)
-                g_obj.save()
-
-        print(f"  [+] Reset & synced: {product.name} ({product.category.name}) -> {product.image.name} + {product.gallery.count()} gallery images")
+        print(f"  [+] Reset & synced: {product.name} ({product.category.name}) -> {product.image.name}")
 
     print("\n[OK] Product reset complete! Total Products:", Product.objects.count())
 
