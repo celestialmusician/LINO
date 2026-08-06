@@ -713,10 +713,7 @@ class ForgotPasswordView(View):
         form = ForgotPasswordForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email'].strip().lower()
-            try:
-                user = User.objects.get(email__iexact=email)
-            except User.DoesNotExist:
-                user = None
+            user = User.objects.filter(email__iexact=email).first()
 
             if user:
                 # Generate 6-digit OTP code
@@ -773,8 +770,9 @@ class VerifyOTPView(View):
         form = VerifyOTPForm(request.POST)
         if form.is_valid():
             otp_entered = form.cleaned_data['otp_code']
-            try:
-                user = User.objects.get(email__iexact=email)
+            user = User.objects.filter(email__iexact=email).first()
+
+            if user:
                 valid_otps = PasswordResetOTP.objects.filter(
                     user=user,
                     otp_code=otp_entered,
@@ -796,7 +794,7 @@ class VerifyOTPView(View):
                     return redirect("set_new_password")
                 else:
                     messages.error(request, "Invalid or expired OTP code. Please check and try again.")
-            except User.DoesNotExist:
+            else:
                 messages.error(request, "Account not found. Please restart the reset process.")
                 return redirect("forgot_password")
 
@@ -816,8 +814,8 @@ class ResendOTPView(View):
             messages.error(request, "Session expired. Please request a new OTP.")
             return redirect("forgot_password")
 
-        try:
-            user = User.objects.get(email__iexact=email)
+        user = User.objects.filter(email__iexact=email).first()
+        if user:
             otp_code = str(random.randint(100000, 999999))
             PasswordResetOTP.objects.create(user=user, otp_code=otp_code)
             request.session['latest_otp'] = otp_code
@@ -836,7 +834,7 @@ class ResendOTPView(View):
                 pass
 
             messages.success(request, f"A new 6-digit OTP code has been sent to {email}.")
-        except User.DoesNotExist:
+        else:
             messages.error(request, "User not found.")
 
         return redirect("verify_otp")
