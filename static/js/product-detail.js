@@ -170,3 +170,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 });
+
+// Global Image Switcher for Product Detail Gallery
+function selectProductImage(thumbBtn, imageUrl) {
+    const mainImg = document.getElementById("mainProductImg");
+    if (!mainImg) return;
+
+    mainImg.style.opacity = "0.4";
+    mainImg.style.transform = "scale(0.96)";
+
+    setTimeout(() => {
+        mainImg.src = imageUrl;
+        mainImg.style.opacity = "1";
+        mainImg.style.transform = "scale(1)";
+    }, 150);
+
+    document.querySelectorAll(".product-thumb-item").forEach(btn => btn.classList.remove("active"));
+    thumbBtn.classList.add("active");
+}

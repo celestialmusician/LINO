@@ -240,6 +240,7 @@ Collections | LINO
                 data-price="₹ {{ product.price }}"
                 data-subtitle="{{ product.subtitle }}"
                 data-image="{{ product.get_image_url }}"
+                data-images="{% for img in product.get_all_images %}{{ img }}{% if not forloop.last %}|{% endif %}{% endfor %}"
                 data-slug="{{ product.slug }}"
                 data-link="{% url 'product-detail' product.slug %}">
 

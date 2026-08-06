@@ -47,6 +47,33 @@ document.addEventListener("DOMContentLoaded", () => {
             quickSubtitle.textContent = button.dataset.subtitle;
             quickPrice.textContent = button.dataset.price;
 
+            // Handle multi-image gallery thumbnails in Quick View modal
+            const quickThumbsList = document.getElementById("quickThumbsList");
+            if (quickThumbsList) {
+                quickThumbsList.innerHTML = "";
+                const rawImages = button.dataset.images || button.dataset.image;
+                const imgArray = rawImages ? rawImages.split("|").filter(Boolean) : [button.dataset.image];
+
+                if (imgArray.length > 1) {
+                    imgArray.forEach((imgUrl, idx) => {
+                        const thumbBtn = document.createElement("button");
+                        thumbBtn.type = "button";
+                        thumbBtn.className = `quick-thumb-item ${idx === 0 ? "active" : ""}`;
+                        thumbBtn.innerHTML = `<img src="${imgUrl}" alt="Thumbnail ${idx + 1}">`;
+                        thumbBtn.addEventListener("click", () => {
+                            quickImage.style.opacity = "0.4";
+                            setTimeout(() => {
+                                quickImage.src = imgUrl;
+                                quickImage.style.opacity = "1";
+                            }, 120);
+                            document.querySelectorAll(".quick-thumb-item").forEach(b => b.classList.remove("active"));
+                            thumbBtn.classList.add("active");
+                        });
+                        quickThumbsList.appendChild(thumbBtn);
+                    });
+                }
+            }
+
             if (cartBtn) {
 
                 cartBtn.dataset.slug = button.dataset.slug;

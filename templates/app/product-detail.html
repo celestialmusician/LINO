@@ -29,16 +29,35 @@
         <div class="product-grid">
 
             <!--=========================
-                    IMAGE
+                    IMAGE & GALLERY
             ==========================-->
 
             <div class="product-image-column">
 
-                <div class="product-image-wrapper">
+                <div class="product-gallery-container">
 
-                    <img
-                        src="{{ product.get_image_url }}"
-                        alt="{{ product.name }}">
+                    <div class="product-image-wrapper">
+
+                        <img
+                            id="mainProductImg"
+                            src="{{ product.get_image_url }}"
+                            alt="{{ product.name }}">
+
+                    </div>
+
+                    {% if product.get_all_images|length > 1 %}
+                    <div class="product-thumbnails-list">
+                        {% for img_url in product.get_all_images %}
+                        <button
+                            type="button"
+                            class="product-thumb-item {% if forloop.first %}active{% endif %}"
+                            onclick="selectProductImage(this, '{{ img_url }}')"
+                            aria-label="View angle {{ forloop.counter }}">
+                            <img src="{{ img_url }}" alt="{{ product.name }} thumbnail {{ forloop.counter }}">
+                        </button>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
 
                 </div>
 

@@ -200,6 +200,37 @@ class Product(models.Model):
         clean_name = self.name.replace(" ", "-").upper()
         return f"/static/images/products/{clean_name}.png"
 
+    @property
+    def get_all_images(self):
+        images = []
+        main_url = self.get_image_url
+        if main_url:
+            images.append(main_url)
+        
+        try:
+            for item in self.gallery.all():
+                if item.image and hasattr(item.image, 'url'):
+                    try:
+                        url = item.image.url
+                        if url not in images:
+                            images.append(url)
+                    except Exception:
+                        pass
+        except Exception:
+            pass
+
+        if len(images) <= 1:
+            try:
+                others = Product.objects.exclude(id=self.id)[:3]
+                for p in others:
+                    p_url = p.get_image_url
+                    if p_url and p_url not in images:
+                        images.append(p_url)
+            except Exception:
+                pass
+
+        return images
+
     def __str__(self):
 
         return self.name
