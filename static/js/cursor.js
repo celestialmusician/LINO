@@ -1,5 +1,5 @@
 //==================================================
-// LINO - CUSTOM CURSOR
+// LINO - CUSTOM CURSOR (HIGH PERFORMANCE & SPEED)
 // Magnetic dot + soft ring following the pointer
 //==================================================
 
@@ -34,40 +34,46 @@ document.addEventListener("DOMContentLoaded", () => {
             position: fixed;
             top: 0; left: 0;
             width: 8px; height: 8px;
+            margin-left: -4px;
+            margin-top: -4px;
             background: #b8955a;
             border-radius: 50%;
             pointer-events: none;
             z-index: 99999;
-            transform: translate(-50%, -50%);
-            transition: width 0.2s, height 0.2s, background 0.2s;
             will-change: transform;
+            transition: width 0.15s ease-out, height 0.15s ease-out, background 0.15s ease-out, opacity 0.15s ease-out;
         }
 
         .cursor-ring {
             position: fixed;
             top: 0; left: 0;
             width: 36px; height: 36px;
+            margin-left: -18px;
+            margin-top: -18px;
             border: 1.5px solid rgba(184, 149, 90, 0.5);
             border-radius: 50%;
             pointer-events: none;
             z-index: 99998;
-            transform: translate(-50%, -50%);
-            transition: width 0.3s, height 0.3s, border-color 0.3s;
             will-change: transform;
+            transition: width 0.2s ease-out, height 0.2s ease-out, border-color 0.2s ease-out, opacity 0.2s ease-out;
         }
 
         .cursor-dot.is-hovering {
             width: 12px; height: 12px;
+            margin-left: -6px;
+            margin-top: -6px;
             background: #c9a96e;
         }
 
         .cursor-ring.is-hovering {
             width: 52px; height: 52px;
+            margin-left: -26px;
+            margin-top: -26px;
             border-color: rgba(184, 149, 90, 0.8);
         }
 
         .cursor-dot.is-clicking {
-            transform: translate(-50%, -50%) scale(0.6);
+            transform: translate3d(var(--cx, -100px), var(--cy, -100px), 0) scale(0.6) !important;
         }
     `;
 
@@ -77,56 +83,54 @@ document.addEventListener("DOMContentLoaded", () => {
     // TRACK MOUSE POSITION
     //--------------------------------------
 
-    let mouseX = 0, mouseY = 0;
-    let ringX  = 0, ringY  = 0;
+    let mouseX = -100, mouseY = -100;
+    let ringX  = -100, ringY  = -100;
 
     document.addEventListener("mousemove", (e) => {
-
         mouseX = e.clientX;
         mouseY = e.clientY;
 
-        dot.style.left = mouseX + "px";
-        dot.style.top  = mouseY + "px";
-
-    });
+        // Instant dot positioning using transform
+        dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+        dot.style.setProperty("--cx", `${mouseX}px`);
+        dot.style.setProperty("--cy", `${mouseY}px`);
+    }, { passive: true });
 
     //--------------------------------------
-    // SMOOTH RING FOLLOW (rAF)
+    // SMOOTH FAST RING FOLLOW (rAF)
     //--------------------------------------
 
     function animateRing() {
+        // High speed smooth interpolation (0.35 factor for fast response)
+        ringX += (mouseX - ringX) * 0.35;
+        ringY += (mouseY - ringY) * 0.35;
 
-        ringX += (mouseX - ringX) * 0.14;
-        ringY += (mouseY - ringY) * 0.14;
-
-        ring.style.left = ringX + "px";
-        ring.style.top  = ringY + "px";
+        ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
 
         requestAnimationFrame(animateRing);
-
     }
 
-    animateRing();
+    requestAnimationFrame(animateRing);
 
     //--------------------------------------
-    // HOVER STATE ON INTERACTIVE ELEMENTS
+    // HOVER STATE WITH EVENT DELEGATION
     //--------------------------------------
 
-    const hoverTargets = "a, button, .product-card, .quick-view-btn, .collection-item, input, textarea, select, label";
+    const hoverSelector = "a, button, .product-card, .quick-view-btn, .collection-item, input, textarea, select, label, [role='button']";
 
-    document.querySelectorAll(hoverTargets).forEach(el => {
-
-        el.addEventListener("mouseenter", () => {
+    document.addEventListener("mouseover", (e) => {
+        if (e.target.closest && e.target.closest(hoverSelector)) {
             dot.classList.add("is-hovering");
             ring.classList.add("is-hovering");
-        });
+        }
+    }, { passive: true });
 
-        el.addEventListener("mouseleave", () => {
+    document.addEventListener("mouseout", (e) => {
+        if (e.target.closest && e.target.closest(hoverSelector)) {
             dot.classList.remove("is-hovering");
             ring.classList.remove("is-hovering");
-        });
-
-    });
+        }
+    }, { passive: true });
 
     //--------------------------------------
     // CLICK STATE
@@ -150,3 +154,4 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
+
