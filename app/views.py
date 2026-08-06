@@ -718,7 +718,10 @@ class ForgotPasswordView(View):
             if user:
                 # Generate 6-digit OTP code
                 otp_code = str(random.randint(100000, 999999))
-                PasswordResetOTP.objects.create(user=user, otp_code=otp_code)
+                try:
+                    PasswordResetOTP.objects.create(user=user, otp_code=otp_code)
+                except Exception:
+                    pass
 
                 request.session['reset_email'] = email
                 request.session['latest_otp'] = otp_code
