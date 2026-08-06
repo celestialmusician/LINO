@@ -11,6 +11,7 @@
 
     padding: var(--section-padding);
     background: var(--color-bg);
+    scroll-margin-top: 60px;
 
 }
 

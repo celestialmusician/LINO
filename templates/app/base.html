@@ -358,27 +358,51 @@
             WHATSAPP FLOATING BUTTON
 ========================================== -->
 
-<div class="whatsapp-widget">
+<div class="whatsapp-widget" id="whatsappWidget">
 
-    <div class="whatsapp-content">
+    <div class="whatsapp-content" id="whatsappCard">
 
-        <span class="whatsapp-title">
+        <button type="button" class="whatsapp-close" id="whatsappClose" aria-label="Close tooltip">&times;</button>
 
-            Need Help?
+        <div class="whatsapp-avatar">
 
-        </span>
+            <i class="fa-solid fa-headset"></i>
 
-        <span class="whatsapp-text">
+            <span class="online-indicator"></span>
 
-            Chat with a Fragrance Expert
+        </div>
 
-        </span>
+        <div class="whatsapp-details">
+
+            <div class="whatsapp-header">
+
+                <span class="whatsapp-title">Need Help?</span>
+
+                <span class="whatsapp-online-tag">
+
+                    <span class="status-dot"></span>
+
+                    Online
+
+                </span>
+
+            </div>
+
+            <span class="whatsapp-text">Chat with a Fragrance Expert</span>
+
+        </div>
 
     </div>
 
-    <a href="https://wa.me/........""
+    <a href="https://wa.me/"
+       target="_blank"
+       rel="noopener noreferrer"
        class="whatsapp-button"
        aria-label="Chat on WhatsApp">
+
+        <span class="whatsapp-ripple"></span>
+
+        <span class="whatsapp-ripple delay"></span>
 
         <i class="fa-brands fa-whatsapp"></i>
 

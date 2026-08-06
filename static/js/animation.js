@@ -4,11 +4,6 @@
 //==================================================
 
 document.addEventListener("DOMContentLoaded", () => {
-
-    //--------------------------------------
-    // SELECTORS TO ANIMATE
-    //--------------------------------------
-
     const animatedSelectors = [
         ".section-heading",
         ".section-label",
@@ -23,55 +18,48 @@ document.addEventListener("DOMContentLoaded", () => {
         ".spec-item",
         ".story-content",
         ".feature-card",
-        ".footer-col",
+        ".footer-links",
         ".collections-heading",
         ".hero-content",
         ".hero-media",
     ];
 
-    //--------------------------------------
-    // PREPARE ELEMENTS
-    //--------------------------------------
+    const elements = document.querySelectorAll(animatedSelectors.join(", "));
 
-    const elements = document.querySelectorAll(
-        animatedSelectors.join(", ")
-    );
+    elements.forEach((el) => {
+        const parent = el.parentElement;
+        const index = parent ? Array.from(parent.children).indexOf(el) : 0;
+        const delay = Math.min(index * 0.08, 0.35);
 
-    elements.forEach((el, index) => {
-
-        el.style.opacity    = "0";
-        el.style.transform  = "translateY(32px)";
-        el.style.transition = `opacity 0.7s ease ${index * 0.05}s, transform 0.7s ease ${index * 0.05}s`;
-
+        el.style.opacity = "0";
+        el.style.transform = "translateY(24px)";
+        el.style.transition = `opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s, transform 0.75s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s`;
     });
-
-    //--------------------------------------
-    // OBSERVER
-    //--------------------------------------
 
     const observer = new IntersectionObserver(
         (entries) => {
-
             entries.forEach(entry => {
-
                 if (entry.isIntersecting) {
+                    const el = entry.target;
+                    el.style.opacity = "1";
+                    el.style.transform = "translateY(0)";
 
-                    entry.target.style.opacity   = "1";
-                    entry.target.style.transform = "translateY(0)";
+                    // Clear inline transition after animation completes so hover styles function cleanly
+                    setTimeout(() => {
+                        el.style.opacity = "";
+                        el.style.transform = "";
+                        el.style.transition = "";
+                    }, 1000);
 
-                    observer.unobserve(entry.target);
-
+                    observer.unobserve(el);
                 }
-
             });
-
         },
         {
-            threshold: 0.12,
-            rootMargin: "0px 0px -40px 0px",
+            threshold: 0.1,
+            rootMargin: "0px 0px -30px 0px",
         }
     );
 
     elements.forEach(el => observer.observe(el));
-
 });
