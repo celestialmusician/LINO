@@ -331,7 +331,7 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             "modal": {
                 "ondismiss": function() {
-                    alert("Payment modal closed. You can complete payment or switch to Cash on Delivery.");
+                    alert("Payment modal closed. You can retry payment whenever you are ready.");
                     if (submitBtn) {
                         submitBtn.disabled = false;
                         submitBtn.textContent = "Place Order";

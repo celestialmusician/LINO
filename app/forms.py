@@ -176,7 +176,7 @@ class CheckoutForm(forms.ModelForm):
 
     def clean_payment_method(self):
         method = self.cleaned_data.get('payment_method', '').strip()
-        if not method or method not in ['cod', 'upi', 'card']:
+        if not method or method not in ['upi', 'card']:
             raise ValidationError("Please select a valid payment method.")
         return method
 

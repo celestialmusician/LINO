@@ -279,7 +279,6 @@ class Order(models.Model):
     ]
 
     PAYMENT_CHOICES = [
-        ("cod", "Cash on Delivery"),
         ("upi", "UPI / GPay / PhonePe"),
         ("card", "Credit / Debit Card"),
     ]
@@ -320,7 +319,7 @@ class Order(models.Model):
     payment_method = models.CharField(
         max_length=20,
         choices=PAYMENT_CHOICES,
-        default="cod"
+        default="upi"
     )
 
     is_paid = models.BooleanField(
