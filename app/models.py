@@ -500,3 +500,38 @@ class PasswordResetOTP(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - OTP: {self.otp_code}"
+
+
+# ==================================================
+# EMAIL CHANGE PASSWORD OTP
+# ==================================================
+
+class ChangePasswordOTP(models.Model):
+    """OTP issued when a logged-in user wants to change their password from profile."""
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="change_password_otps"
+    )
+
+    otp_code = models.CharField(
+        max_length=6
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    is_used = models.BooleanField(
+        default=False
+    )
+
+    def is_valid(self):
+        from django.utils import timezone
+        import datetime
+        now = timezone.now()
+        return not self.is_used and (now - self.created_at) < datetime.timedelta(minutes=10)
+
+    def __str__(self):
+        return f"{self.user.email} - Change PW OTP: {self.otp_code}"

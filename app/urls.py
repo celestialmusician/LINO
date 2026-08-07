@@ -141,4 +141,16 @@ urlpatterns = [
         name="change_password",
     ),
 
+    path(
+        "verify-change-password-otp/",
+        views.VerifyChangePasswordOTPView.as_view(),
+        name="verify_change_password_otp",
+    ),
+
+    path(
+        "resend-change-password-otp/",
+        views.ResendChangePasswordOTPView.as_view(),
+        name="resend_change_password_otp",
+    ),
+
 ]
