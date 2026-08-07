@@ -532,7 +532,7 @@ class ProfileView(LoginRequiredMixin, View):
 
         if form.is_valid():
             full_name = form.cleaned_data['full_name']
-            email = form.cleaned_data['email']
+            email = form.cleaned_data['email'].strip().lower()
 
             name_parts = full_name.split(" ", 1)
             request.user.first_name = name_parts[0]
@@ -585,20 +585,27 @@ class LoginView(View):
         form = UserLoginForm(request.POST)
 
         if form.is_valid():
-            email = form.cleaned_data['email']
+            email_input = form.cleaned_data['email'].strip()
             password = form.cleaned_data['password']
 
-            try:
-                user_obj = User.objects.get(email=email)
-                username = user_obj.username
-            except User.DoesNotExist:
+            # Case-insensitive lookup by email or username
+            user_obj = User.objects.filter(email__iexact=email_input).first()
+            if not user_obj:
+                user_obj = User.objects.filter(username__iexact=email_input).first()
+
+            if not user_obj:
                 msg = "No account found with this email address."
                 if is_ajax:
                     return JsonResponse({"status": "ERROR", "message": msg}, status=400)
                 messages.error(request, msg)
                 return render(request, self.template_name, {"form": form})
 
-            user = authenticate(request, username=username, password=password)
+            # Authenticate using user_obj.username, fallback to email if necessary
+            user = authenticate(request, username=user_obj.username, password=password)
+            if user is None and user_obj.email:
+                user = authenticate(request, username=user_obj.email, password=password)
+            if user is None:
+                user = authenticate(request, username=email_input, password=password)
 
             if user is not None:
                 login(request, user)
@@ -647,7 +654,7 @@ class RegisterView(View):
 
         if form.is_valid():
             full_name = form.cleaned_data['full_name']
-            email = form.cleaned_data['email']
+            email = form.cleaned_data['email'].strip().lower()
             password = form.cleaned_data['password']
 
             name_parts = full_name.split(" ", 1)
@@ -655,6 +662,11 @@ class RegisterView(View):
             last_name = name_parts[1] if len(name_parts) > 1 else ""
 
             username = email[:150]
+            base_username = username
+            counter = 1
+            while User.objects.filter(username__iexact=username).exists():
+                username = f"{base_username[:140]}_{counter}"
+                counter += 1
 
             user = User.objects.create_user(
                 username=username,

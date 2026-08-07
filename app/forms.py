@@ -55,7 +55,7 @@ class UserRegisterForm(forms.Form):
 
     def clean_email(self):
         email = self.cleaned_data.get('email', '').strip().lower()
-        if User.objects.filter(email=email).exists():
+        if User.objects.filter(email__iexact=email).exists() or User.objects.filter(username__iexact=email).exists():
             raise ValidationError("An account with this email already exists.")
         return email
 
@@ -84,9 +84,9 @@ class UserRegisterForm(forms.Form):
 
 class UserLoginForm(forms.Form):
 
-    email = forms.EmailField(
+    email = forms.CharField(
         required=True,
-        widget=forms.EmailInput(attrs={
+        widget=forms.TextInput(attrs={
             'placeholder': 'Email Address',
             'required': True,
         })
@@ -99,6 +99,9 @@ class UserLoginForm(forms.Form):
             'required': True,
         })
     )
+
+    def clean_email(self):
+        return self.cleaned_data.get('email', '').strip()
 
 
 # ==================================================
