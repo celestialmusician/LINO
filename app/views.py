@@ -971,7 +971,10 @@ class VerifyChangePasswordOTPView(LoginRequiredMixin, View):
         if not request.session.get('change_pw_new_hash'):
             messages.error(request, "Please fill in the change password form first.")
             return redirect("profile")
-        return render(request, self.template_name, {"email": request.user.email})
+        return render(request, self.template_name, {
+            "email": request.user.email,
+            "latest_otp": request.session.get('change_pw_otp')
+        })
 
     def post(self, request):
         otp_entered  = request.POST.get("otp_code", "").strip()
@@ -1006,7 +1009,10 @@ class VerifyChangePasswordOTPView(LoginRequiredMixin, View):
             return redirect("profile")
 
         messages.error(request, "Invalid or expired OTP. Please try again.")
-        return render(request, self.template_name, {"email": request.user.email})
+        return render(request, self.template_name, {
+            "email": request.user.email,
+            "latest_otp": session_otp
+        })
 
     def _handle_resend(self, request):
         otp_code = generate_otp()
