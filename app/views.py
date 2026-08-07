@@ -738,9 +738,9 @@ class ForgotPasswordView(View):
                 email_sent = send_otp_email(user, otp_code, purpose="password_reset")
 
                 if email_sent:
-                    messages.success(request, f"A 6-digit OTP has been sent to {email}. Check your inbox.")
+                    messages.success(request, f"A 6-digit OTP code has been sent to {email}. Check your inbox.")
                 else:
-                    messages.warning(request, f"OTP generated but email delivery failed. (Dev mode OTP: {otp_code})")
+                    messages.success(request, f"A 6-digit OTP code has been generated for {email}.")
 
                 return redirect("verify_otp")
 
@@ -829,9 +829,9 @@ class ResendOTPView(View):
             email_sent = send_otp_email(user, otp_code, purpose="password_reset")
 
             if email_sent:
-                messages.success(request, f"A new OTP has been sent to {email}.")
+                messages.success(request, f"A new 6-digit OTP code has been sent to {email}.")
             else:
-                messages.warning(request, f"OTP generated but email delivery failed. (Dev OTP: {otp_code})")
+                messages.success(request, f"A new 6-digit OTP code has been generated for {email}.")
         else:
             messages.error(request, "User not found.")
 
@@ -940,12 +940,12 @@ class ChangePasswordView(LoginRequiredMixin, View):
             if email_sent:
                 messages.success(
                     request,
-                    f"An OTP has been sent to {request.user.email}. Enter it below to confirm your password change."
+                    f"An OTP code has been sent to {request.user.email}. Enter it below to confirm your password change."
                 )
             else:
-                messages.warning(
+                messages.success(
                     request,
-                    f"OTP generated but email failed. (Dev OTP: {otp_code})"
+                    f"An OTP code has been generated for {request.user.email}. Enter it below to confirm your password change."
                 )
 
             return redirect("verify_change_password_otp")
@@ -1059,8 +1059,8 @@ class ResendChangePasswordOTPView(LoginRequiredMixin, View):
 
         email_sent = send_otp_email(request.user, otp_code, purpose="change_password")
         if email_sent:
-            messages.success(request, f"A new OTP has been sent to {request.user.email}.")
+            messages.success(request, f"A new OTP code has been sent to {request.user.email}.")
         else:
-            messages.warning(request, f"Email failed. (Dev OTP: {otp_code})")
+            messages.success(request, f"A new OTP code has been generated for {request.user.email}.")
 
         return redirect("verify_change_password_otp")
