@@ -382,6 +382,190 @@
     margin: 20px 0;
     outline: none;
 }
+
+/* ==================================================
+   DUMMY TEST CARD PANEL
+   ================================================== */
+.test-card-toggle {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+    background: linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%);
+    color: #0d0a08;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+}
+.test-card-toggle:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(212, 175, 55, 0.65);
+}
+
+.test-card-panel {
+    position: fixed;
+    bottom: 90px;
+    right: 30px;
+    z-index: 999;
+    width: 340px;
+    background: rgba(14, 10, 7, 0.97);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(212, 175, 55, 0.45);
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(212, 175, 55, 0.08);
+    display: none;
+    animation: tcSlideUp 0.3s ease;
+}
+.test-card-panel.open {
+    display: block;
+}
+
+@keyframes tcSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.tc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+.tc-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #D4AF37;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.tc-close {
+    background: transparent;
+    border: none;
+    color: #a0958a;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 4px;
+    transition: color 0.2s;
+}
+.tc-close:hover { color: #fff; }
+
+.tc-section-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #6b5e55;
+    margin-bottom: 8px;
+    margin-top: 14px;
+    font-weight: 600;
+}
+.tc-section-label:first-of-type { margin-top: 0; }
+
+.tc-card-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+.tc-card-row::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(#D4AF37, #AA7C11);
+    border-radius: 3px 0 0 3px;
+}
+.tc-card-row:hover {
+    border-color: rgba(212, 175, 55, 0.4);
+    background: rgba(212, 175, 55, 0.06);
+    transform: translateX(3px);
+}
+.tc-card-row.success-state {
+    border-color: rgba(34, 197, 94, 0.5);
+    background: rgba(34, 197, 94, 0.07);
+}
+.tc-card-row.success-state::before {
+    background: #22c55e;
+}
+.tc-card-row.failure-state {
+    border-color: rgba(239, 68, 68, 0.5);
+    background: rgba(239, 68, 68, 0.07);
+}
+.tc-card-row.failure-state::before {
+    background: #ef4444;
+}
+
+.tc-card-info {
+    flex: 1;
+}
+.tc-card-num {
+    font-family: 'Courier New', monospace;
+    font-size: 0.82rem;
+    color: #e5ded7;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+}
+.tc-card-meta {
+    font-size: 0.7rem;
+    color: #6b5e55;
+}
+.tc-fill-btn {
+    background: rgba(212, 175, 55, 0.15);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: #D4AF37;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    margin-left: 10px;
+}
+.tc-fill-btn:hover {
+    background: rgba(212, 175, 55, 0.3);
+    border-color: #D4AF37;
+}
+.tc-fill-btn.filled {
+    background: rgba(34, 197, 94, 0.2);
+    border-color: rgba(34, 197, 94, 0.5);
+    color: #22c55e;
+}
+
+.tc-note {
+    margin-top: 14px;
+    padding: 10px 12px;
+    background: rgba(212, 175, 55, 0.06);
+    border: 1px solid rgba(212, 175, 55, 0.15);
+    border-radius: 8px;
+    font-size: 0.72rem;
+    color: #8c8278;
+    line-height: 1.5;
+}
+.tc-note strong {
+    color: #D4AF37;
+}
 </style>
 
 <section class="rzp-payment-page">
@@ -568,6 +752,85 @@
     </div>
 </div>
 
+<!-- =============================================
+     RAZORPAY DUMMY TEST CARD PANEL
+     ============================================= -->
+<button class="test-card-toggle" id="tcToggleBtn" title="Open Test Cards Panel">
+    <i class="fa-solid fa-flask"></i> Test Cards
+</button>
+
+<div class="test-card-panel" id="tcPanel">
+    <div class="tc-header">
+        <div class="tc-title">
+            <i class="fa-solid fa-credit-card"></i> Razorpay Test Cards
+        </div>
+        <button class="tc-close" id="tcCloseBtn" title="Close">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <!-- Success Cards -->
+    <div class="tc-section-label">✅ Success Cards (Payment will pass)</div>
+
+    <div class="tc-card-row success-state" data-number="4111 1111 1111 1111" data-expiry="12 / 28" data-cvv="123" data-name="Test User">
+        <div class="tc-card-info">
+            <div class="tc-card-num">4111 1111 1111 1111</div>
+            <div class="tc-card-meta">Visa • Any CVV • Any future date</div>
+        </div>
+        <button class="tc-fill-btn" onclick="event.stopPropagation()">Fill</button>
+    </div>
+
+    <div class="tc-card-row success-state" data-number="5267 3181 8797 5449" data-expiry="12 / 28" data-cvv="123" data-name="Test User">
+        <div class="tc-card-info">
+            <div class="tc-card-num">5267 3181 8797 5449</div>
+            <div class="tc-card-meta">Mastercard • CVV: 123 • Exp: 12/28</div>
+        </div>
+        <button class="tc-fill-btn" onclick="event.stopPropagation()">Fill</button>
+    </div>
+
+    <div class="tc-card-row success-state" data-number="4000 0000 0000 0002" data-expiry="12 / 28" data-cvv="123" data-name="Test User">
+        <div class="tc-card-info">
+            <div class="tc-card-num">4000 0000 0000 0002</div>
+            <div class="tc-card-meta">Visa • No 3D Secure (direct success)</div>
+        </div>
+        <button class="tc-fill-btn" onclick="event.stopPropagation()">Fill</button>
+    </div>
+
+    <!-- Failure Cards -->
+    <div class="tc-section-label">❌ Failure Cards (Payment will fail)</div>
+
+    <div class="tc-card-row failure-state" data-number="4000 0000 0000 0119" data-expiry="12 / 28" data-cvv="123" data-name="Test User">
+        <div class="tc-card-info">
+            <div class="tc-card-num">4000 0000 0000 0119</div>
+            <div class="tc-card-meta">Visa • Always declines</div>
+        </div>
+        <button class="tc-fill-btn" onclick="event.stopPropagation()">Fill</button>
+    </div>
+
+    <div class="tc-card-row failure-state" data-number="4000 0000 0000 9995" data-expiry="12 / 28" data-cvv="123" data-name="Test User">
+        <div class="tc-card-info">
+            <div class="tc-card-num">4000 0000 0000 9995</div>
+            <div class="tc-card-meta">Mastercard • Insufficient funds</div>
+        </div>
+        <button class="tc-fill-btn" onclick="event.stopPropagation()">Fill</button>
+    </div>
+
+    <!-- OTP hint -->
+    <div class="tc-section-label">🔑 OTP / 3D Secure</div>
+    <div class="tc-card-row success-state" style="cursor:default;">
+        <div class="tc-card-info">
+            <div class="tc-card-num" style="font-size:1rem; letter-spacing:3px;">1 2 3 4 5 6</div>
+            <div class="tc-card-meta">Use this OTP in the verification step</div>
+        </div>
+        <button class="tc-fill-btn" id="fillOtpBtn">Fill</button>
+    </div>
+
+    <div class="tc-note">
+        <strong>ℹ️ Sandbox only.</strong> These are Razorpay's official test credentials.
+        Use Key ID starting with <strong>rzp_test_</strong> in your <code>.env</code> to activate test mode.
+    </div>
+</div>
+
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     // Tab Switcher
@@ -698,6 +961,64 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 });
+
+// ── Test Card Panel Logic ────────────────────────────────────────
+(function() {
+    const toggleBtn = document.getElementById('tcToggleBtn');
+    const panel     = document.getElementById('tcPanel');
+    const closeBtn  = document.getElementById('tcCloseBtn');
+
+    // Open / close
+    toggleBtn.addEventListener('click', () => panel.classList.toggle('open'));
+    closeBtn.addEventListener('click',  () => panel.classList.remove('open'));
+
+    // Auto-fill card rows
+    document.querySelectorAll('.tc-card-row[data-number]').forEach(row => {
+        const fillBtn = row.querySelector('.tc-fill-btn');
+        if (!fillBtn) return;
+
+        const doFill = () => {
+            const numEl    = document.getElementById('cardNumber');
+            const expiryEl = document.getElementById('cardExpiry');
+            const cvvEl    = document.getElementById('cardCvv');
+            const nameEl   = document.getElementById('cardName');
+
+            if (numEl)    numEl.value    = row.dataset.number;
+            if (expiryEl) expiryEl.value = row.dataset.expiry;
+            if (cvvEl)    cvvEl.value    = row.dataset.cvv;
+            if (nameEl)   nameEl.value   = row.dataset.name;
+
+            // Switch to Card tab
+            document.querySelectorAll('.gw-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.gw-tab-content').forEach(c => c.style.display = 'none');
+            const cardTab = document.querySelector('.gw-tab[data-target="tabCard"]');
+            if (cardTab) { cardTab.classList.add('active'); document.getElementById('tabCard').style.display = 'block'; }
+
+            // Visual feedback
+            fillBtn.textContent = '✓ Done';
+            fillBtn.classList.add('filled');
+            setTimeout(() => { fillBtn.textContent = 'Fill'; fillBtn.classList.remove('filled'); }, 2000);
+
+            panel.classList.remove('open');
+        };
+
+        fillBtn.addEventListener('click', doFill);
+        row.addEventListener('click', doFill);
+    });
+
+    // Fill OTP field
+    const fillOtpBtn = document.getElementById('fillOtpBtn');
+    if (fillOtpBtn) {
+        fillOtpBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const otpField = document.getElementById('otpInput');
+            if (otpField) otpField.value = '123456';
+            fillOtpBtn.textContent = '✓ Done';
+            fillOtpBtn.classList.add('filled');
+            setTimeout(() => { fillOtpBtn.textContent = 'Fill'; fillOtpBtn.classList.remove('filled'); }, 2000);
+        });
+    }
+})();
 </script>
 
 {% endblock %}
