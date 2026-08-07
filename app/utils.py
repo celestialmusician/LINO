@@ -4,7 +4,7 @@ Sends beautifully branded HTML emails for OTP verification.
 """
 
 import secrets
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives, get_connection
 from django.conf import settings
 
 
@@ -168,11 +168,13 @@ def send_otp_email(user, otp_code: str, purpose: str = "password_reset", valid_m
     )
 
     try:
+        connection = get_connection(fail_silently=False, timeout=5)
         msg = EmailMultiAlternatives(
             subject=subject,
             body=plain_body,
             from_email=from_email,
             to=[user.email],
+            connection=connection,
         )
         msg.attach_alternative(html_body, "text/html")
         msg.send(fail_silently=False)
