@@ -198,6 +198,6 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=False, cast=bool)
 EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=True, cast=bool)
 EMAIL_TIMEOUT = 5  # 5 seconds max socket timeout to prevent server hanging
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default=config('EMAIL_HOST_USER', default='LINO Atelier <mylino2026@gmail.com>'))
-SHOW_TEST_OTP = config('SHOW_TEST_OTP', default=False, cast=bool)
+SHOW_TEST_OTP = config('SHOW_TEST_OTP', default=True, cast=bool)
 RESEND_API_KEY = config('RESEND_API_KEY', default='')
 BREVO_API_KEY = config('BREVO_API_KEY', default='')

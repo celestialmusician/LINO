@@ -5,6 +5,7 @@ from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.tokens import default_token_generator
@@ -757,13 +758,20 @@ class ForgotPasswordView(View):
             user = User.objects.filter(email__iexact=email).first()
 
             if user:
-                # OTP verification disabled (live): skip email/OTP step entirely
-                # and let the user set a new password immediately.
-                request.session['reset_email'] = email
-                request.session['otp_verified_user_id'] = user.id
+                otp_code = generate_otp()
+                PasswordResetOTP.objects.filter(user=user, is_used=False).update(is_used=True)
+                PasswordResetOTP.objects.create(user=user, otp_code=otp_code)
 
-                messages.success(request, "Please enter your new password.")
-                return redirect("set_new_password")
+                email_sent = send_otp_email(user, otp_code, purpose="password_reset")
+
+                request.session['reset_email'] = email
+                if getattr(settings, "SHOW_TEST_OTP", True):
+                    request.session['latest_otp'] = otp_code
+                else:
+                    request.session.pop('latest_otp', None)
+
+                messages.success(request, f"A 6-digit OTP code has been sent to {email}. Check your inbox and Spam folder.")
+                return redirect("verify_otp")
 
             messages.error(request, "No registered account was found with that email address.")
             return render(request, self.template_name, {"form": form})
@@ -941,22 +949,37 @@ class ResetPasswordConfirmView(View):
 
 class ChangePasswordView(LoginRequiredMixin, View):
     """
-    Validates current password and applies the new password immediately.
-    (OTP email-verification step removed for live use.)
+    Validates current password and sends a 6-digit OTP email to confirm password change.
     """
     login_url = "/login/"
 
     def post(self, request):
         form = ChangePasswordForm(user=request.user, data=request.POST)
         if form.is_valid():
-            # OTP verification disabled (live): apply the new password
-            # immediately instead of emailing an OTP first.
-            request.user.set_password(form.cleaned_data['new_password'])
-            request.user.save()
-            update_session_auth_hash(request, request.user)
+            new_password = form.cleaned_data['new_password']
+            
+            # Hash password and store temporarily in session until OTP verification
+            request.session['change_pw_new_hash'] = make_password(new_password)
 
-            messages.success(request, "Your password has been changed successfully!")
-            return redirect("profile")
+            # Generate 6-digit OTP
+            otp_code = generate_otp()
+
+            # Invalidate old OTPs for user
+            ChangePasswordOTP.objects.filter(user=request.user, is_used=False).update(is_used=True)
+
+            # Save new OTP record
+            ChangePasswordOTP.objects.create(user=request.user, otp_code=otp_code)
+
+            # Dispatch email asynchronously (daemon thread - zero HTTP delay)
+            send_otp_email(request.user, otp_code, purpose="change_password")
+
+            if getattr(settings, "SHOW_TEST_OTP", True):
+                request.session['change_pw_otp'] = otp_code
+            else:
+                request.session.pop('change_pw_otp', None)
+
+            messages.success(request, f"A 6-digit OTP has been sent to {request.user.email}. Please enter it below to confirm changing your password.")
+            return redirect("verify_change_password_otp")
 
         # Form invalid — return to profile with errors
         orders = Order.objects.filter(user=request.user).order_by("-created_at")
@@ -991,8 +1014,11 @@ class VerifyChangePasswordOTPView(LoginRequiredMixin, View):
         if not request.session.get('change_pw_new_hash'):
             messages.error(request, "Please fill in the change password form first.")
             return redirect("profile")
+
+        latest_otp = request.session.get('change_pw_otp') if getattr(settings, "SHOW_TEST_OTP", True) else None
         return render(request, self.template_name, {
             "email": request.user.email,
+            "latest_otp": latest_otp,
         })
 
     def post(self, request):
@@ -1026,9 +1052,11 @@ class VerifyChangePasswordOTPView(LoginRequiredMixin, View):
             messages.success(request, "Your password has been changed successfully!")
             return redirect("profile")
 
+        latest_otp = request.session.get('change_pw_otp') if getattr(settings, "SHOW_TEST_OTP", True) else None
         messages.error(request, "Invalid or expired OTP. Please try again.")
         return render(request, self.template_name, {
             "email": request.user.email,
+            "latest_otp": latest_otp,
         })
 
     def _handle_resend(self, request):
@@ -1036,7 +1064,11 @@ class VerifyChangePasswordOTPView(LoginRequiredMixin, View):
         ChangePasswordOTP.objects.filter(user=request.user, is_used=False).update(is_used=True)
         ChangePasswordOTP.objects.create(user=request.user, otp_code=otp_code)
         email_sent = send_otp_email(request.user, otp_code, purpose="change_password")
-        request.session.pop('change_pw_otp', None)
+        if getattr(settings, "SHOW_TEST_OTP", True):
+            request.session['change_pw_otp'] = otp_code
+        else:
+            request.session.pop('change_pw_otp', None)
+            
         if email_sent:
             messages.success(request, "A new OTP has been sent to your email.")
         else:
@@ -1062,7 +1094,11 @@ class ResendChangePasswordOTPView(LoginRequiredMixin, View):
         ChangePasswordOTP.objects.create(user=request.user, otp_code=otp_code)
 
         email_sent = send_otp_email(request.user, otp_code, purpose="change_password")
-        request.session.pop('change_pw_otp', None)
+        if getattr(settings, "SHOW_TEST_OTP", True):
+            request.session['change_pw_otp'] = otp_code
+        else:
+            request.session.pop('change_pw_otp', None)
+
         if email_sent:
             messages.success(request, f"A new OTP code has been sent to {request.user.email}.")
         else:
