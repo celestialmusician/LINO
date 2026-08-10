@@ -3,6 +3,8 @@ app/utils.py — LINO Email OTP Utility
 Sends beautifully branded HTML emails for OTP verification.
 """
 
+import json
+import urllib.request
 import secrets
 import threading
 from django.core.mail import EmailMultiAlternatives, get_connection
@@ -10,7 +12,58 @@ from django.conf import settings
 
 
 def _send_email_async(subject, plain_body, from_email, target_email, html_body):
-    """Worker thread to dispatch email asynchronously with a dedicated socket connection."""
+    """Worker thread to dispatch email asynchronously via Resend/Brevo API or SMTP."""
+    resend_key = getattr(settings, "RESEND_API_KEY", "")
+    brevo_key = getattr(settings, "BREVO_API_KEY", "")
+
+    # 1. Try Resend API if API key provided
+    if resend_key:
+        try:
+            url = "https://api.resend.com/emails"
+            headers = {
+                "Authorization": f"Bearer {resend_key}",
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "from": from_email,
+                "to": [target_email],
+                "subject": subject,
+                "html": html_body,
+                "text": plain_body
+            }
+            req = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'), headers=headers, method='POST')
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                if resp.status in (200, 201):
+                    print(f"[LINO EMAIL SUCCESS via RESEND] OTP sent to {target_email}")
+                    return
+        except Exception as exc:
+            print(f"[LINO RESEND API ERROR] {target_email}: {exc}")
+
+    # 2. Try Brevo API if API key provided
+    if brevo_key:
+        try:
+            url = "https://api.brevo.com/v3/smtp/email"
+            headers = {
+                "api-key": brevo_key,
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+            payload = {
+                "sender": {"email": "mylino2026@gmail.com", "name": "LINO Atelier"},
+                "to": [{"email": target_email}],
+                "subject": subject,
+                "htmlContent": html_body,
+                "textContent": plain_body
+            }
+            req = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'), headers=headers, method='POST')
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                if resp.status in (200, 201, 202):
+                    print(f"[LINO EMAIL SUCCESS via BREVO] OTP sent to {target_email}")
+                    return
+        except Exception as exc:
+            print(f"[LINO BREVO API ERROR] {target_email}: {exc}")
+
+    # 3. Fallback to standard SMTP (Gmail / configured backend)
     try:
         connection = get_connection(fail_silently=False, timeout=10)
         msg = EmailMultiAlternatives(
@@ -22,9 +75,9 @@ def _send_email_async(subject, plain_body, from_email, target_email, html_body):
         )
         msg.attach_alternative(html_body, "text/html")
         msg.send(fail_silently=False)
-        print(f"[LINO EMAIL SUCCESS] OTP sent to {target_email}")
+        print(f"[LINO EMAIL SUCCESS via SMTP] OTP sent to {target_email}")
     except Exception as exc:
-        print(f"[LINO EMAIL ERROR] {target_email}: {exc}")
+        print(f"[LINO EMAIL ERROR via SMTP] {target_email}: {exc}")
 
 
 # ─────────────────────────────────────────────────────────────────
