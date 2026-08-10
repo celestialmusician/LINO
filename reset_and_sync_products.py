@@ -197,7 +197,29 @@ def ensure_admin_user():
     else:
         print("  [=] Ensured admin superuser credentials (admin / admin123)")
 
+def ensure_test_customer():
+    from django.contrib.auth.models import User
+    from app.models import UserProfile
+    email = "arunsreeaswin2906@gmail.com"
+    user, created = User.objects.get_or_create(
+        username=email,
+        defaults={
+            "email": email,
+            "first_name": "Arun",
+            "last_name": "Sree",
+        }
+    )
+    user.set_password("arun1234")
+    user.save()
+    profile, _ = UserProfile.objects.get_or_create(user=user)
+    if created:
+        print(f"  [+] Seeded customer account: {email}")
+    else:
+        print(f"  [=] Customer account active: {email}")
+
 if __name__ == "__main__":
     ensure_admin_user()
+    ensure_test_customer()
     reset_products()
+
 
