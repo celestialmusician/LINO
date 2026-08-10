@@ -177,7 +177,7 @@ RAZORPAY_KEY_SECRET = config('RAZORPAY_KEY_SECRET', default='lino_dummy_secret')
 # ==========================================
 
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='').replace(' ', '').strip()
 
 # Fallback to console backend if password is empty or placeholder
 is_dummy_password = (
@@ -198,6 +198,6 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=False, cast=bool)
 EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=True, cast=bool)
 EMAIL_TIMEOUT = 5  # 5 seconds max socket timeout to prevent server hanging
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default=config('EMAIL_HOST_USER', default='LINO Atelier <mylino2026@gmail.com>'))
-SHOW_TEST_OTP = config('SHOW_TEST_OTP', default=True, cast=bool)
+SHOW_TEST_OTP = config('SHOW_TEST_OTP', default=False, cast=bool)
 RESEND_API_KEY = config('RESEND_API_KEY', default='')
 BREVO_API_KEY = config('BREVO_API_KEY', default='')
