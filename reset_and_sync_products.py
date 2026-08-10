@@ -178,5 +178,26 @@ def reset_products():
 
     print("\n[OK] Product sync complete! Total Products:", Product.objects.count())
 
+def ensure_admin_user():
+    from django.contrib.auth.models import User
+    admin_user, created = User.objects.get_or_create(
+        username="admin",
+        defaults={
+            "email": "admin@linoparfums.com",
+            "is_staff": True,
+            "is_superuser": True,
+        }
+    )
+    admin_user.set_password("admin123")
+    admin_user.is_staff = True
+    admin_user.is_superuser = True
+    admin_user.save()
+    if created:
+        print("  [+] Created default superuser: admin")
+    else:
+        print("  [=] Ensured admin superuser credentials (admin / admin123)")
+
 if __name__ == "__main__":
+    ensure_admin_user()
     reset_products()
+

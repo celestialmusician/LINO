@@ -1,62 +1,98 @@
 /*==================================================
-    LINO PERFUMS – ULTRA-LUXURY ADMIN THEME v3.0
-    Bespoke White & Gold Perfumerie Dashboard
+    LINO PARFUMS – ULTRA-PREMIUM SKEUOMORPHIC ADMIN THEME v6.0
+    Bespoke White & Black Luxury Perfumerie Dashboard
 ==================================================*/
 
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=Libre+Bodoni:ital,wght@0,600;0,700;1,400&display=swap');
 
-:root {
-    --primary: #111111;
-    --header-bg: #111111;
-    --accent: #B8955A;
-    --accent-hover: #C9A96E;
-    --accent-light: #F8F5F0;
-    --body-bg: #FAF9F6;
-    --card-bg: #FFFFFF;
-    --border-color: #E6E4DF;
-    --text-main: #111111;
-    --text-muted: #666666;
+/* ==========================================
+   DJANGO THEME VARIABLE OVERRIDES (DARK & LIGHT)
+========================================== */
+
+:root, [data-theme="light"], [data-theme="dark"] {
+    --body-bg: #EFEFEA !important;
+    --body-fg: #111111 !important;
+    --header-bg: #111111 !important;
+    --header-fg: #FAFAF8 !important;
+    --primary: #111111 !important;
+    --secondary: #222222 !important;
+    --accent: #B8955A !important;
+    --darkened-bg: #E4E3DE !important;
+    --selected-bg: #F8F5F0 !important;
+    --selected-row: #F5EFE4 !important;
+    --breadcrumbs-bg: #EBEBE6 !important;
+    --border-color: #D8D6D0 !important;
+    
+    --primary-gradient: linear-gradient(180deg, #2A2A2A 0%, #0E0E0E 100%) !important;
+    --card-gradient: linear-gradient(180deg, #FFFFFF 0%, #F5F4F0 100%) !important;
+    --button-gradient: linear-gradient(180deg, #3A3A3A 0%, #141414 100%) !important;
+    --button-hover-gradient: linear-gradient(180deg, #4A4A4A 0%, #202020 100%) !important;
+    --button-secondary-gradient: linear-gradient(180deg, #FFFFFF 0%, #E9E8E3 100%) !important;
+    --input-bg-gradient: linear-gradient(180deg, #EBEBE6 0%, #FAFAFA 100%) !important;
+    
+    --accent-gold: #B8955A;
+    --accent-gold-hover: #C9A96E;
+    --accent-gold-light: #F8F5F0;
+    
+    --text-dark: #111111;
+    --text-light: #FAFAF8;
+    --text-muted: #555555;
+    
+    --skeuo-card-shadow: 0 12px 28px rgba(0, 0, 0, 0.12), inset 0 1px 0 #FFFFFF, inset 0 -1px 0 #D8D6D0, 0 2px 4px rgba(0, 0, 0, 0.06);
+    --skeuo-btn-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 4px 10px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.2);
+    --skeuo-input-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.14), inset 0 0 0 1px #BCBCB6, 0 1px 0 #FFFFFF;
+    
     --font-heading: "Cormorant Garamond", Georgia, serif;
     --font-logo: "Libre Bodoni", Georgia, serif;
     --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* ==========================================
-   GLOBAL RESET & BASE
+   GLOBAL RESET & BASE BACKGROUND
 ========================================== */
 
 html, body {
     font-family: var(--font-body) !important;
-    background-color: var(--body-bg) !important;
-    color: var(--text-main) !important;
+    background: #EFEFEA !important;
+    background-image: 
+        radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.6) 0%, transparent 75%),
+        linear-gradient(180deg, #F4F3F0 0%, #E4E3DE 100%) !important;
+    color: #111111 !important;
     margin: 0;
     padding: 0;
     -webkit-font-smoothing: antialiased;
+    min-height: 100vh !important;
 }
 
 a {
-    color: var(--text-main) !important;
+    color: #111111 !important;
     text-decoration: none !important;
-    transition: color 0.2s ease !important;
+    transition: all 0.2s ease !important;
 }
 
 a:hover {
-    color: var(--accent) !important;
+    color: var(--accent-gold) !important;
 }
 
 /* ==========================================
-   HEADER & NAVBAR
+   HEADER & NAVBAR (SKEUOMORPHIC OBSIDIAN BAR)
 ========================================== */
 
 #header {
-    background: #111111 !important;
-    color: #FAFAF8 !important;
+    background: var(--primary-gradient) !important;
+    color: var(--text-light) !important;
     padding: 14px 36px !important;
-    border-bottom: 2px solid var(--accent) !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+    border-top: 1px solid #484848 !important;
+    border-bottom: 2px solid var(--accent-gold) !important;
+    box-shadow: 
+        0 6px 18px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        inset 0 -1px 0 #000000 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
+    position: relative !important;
+    z-index: 100 !important;
 }
 
 .admin-brand-link {
@@ -70,90 +106,92 @@ a:hover {
     height: 38px !important;
     width: auto !important;
     object-fit: contain !important;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-    transition: transform 0.3s ease !important;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5)) !important;
+    transition: transform 0.25s ease !important;
 }
 
 .admin-brand-link:hover .admin-logo-img {
-    transform: scale(1.05) !important;
+    transform: scale(1.05) translateY(-1px) !important;
 }
 
 .admin-brand-tag {
     font-family: var(--font-body) !important;
     font-size: 11px !important;
     letter-spacing: 3px !important;
-    color: var(--accent) !important;
-    font-weight: 600 !important;
+    color: var(--accent-gold) !important;
+    font-weight: 700 !important;
     text-transform: uppercase !important;
     border-left: 1px solid rgba(184, 149, 90, 0.4) !important;
     padding-left: 14px !important;
     margin-left: 4px !important;
-}
-
-.admin-brand-text {
-    font-family: var(--font-logo) !important;
-    font-size: 20px !important;
-    font-weight: 700 !important;
-    letter-spacing: 3px !important;
-    color: #FAFAF8 !important;
-    text-transform: uppercase !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-}
-
-.admin-brand-text::after {
-    content: "• ADMIN PANEL";
-    font-family: var(--font-body) !important;
-    font-size: 10px !important;
-    letter-spacing: 3px !important;
-    color: var(--accent) !important;
-    font-weight: 600 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
 }
 
 #user-tools {
     font-family: var(--font-body) !important;
     font-size: 11px !important;
     letter-spacing: 1.5px !important;
-    color: #A0A0A0 !important;
+    color: #CCCCCC !important;
     text-transform: uppercase !important;
+    text-shadow: 0 1px 1px #000000 !important;
 }
 
 #user-tools a {
-    color: var(--accent) !important;
+    background: linear-gradient(180deg, #3A3A3A 0%, #1A1A1A 100%) !important;
+    color: #FFFFFF !important;
     font-weight: 600 !important;
-    margin-left: 10px !important;
+    padding: 6px 14px !important;
+    border-radius: 20px !important;
+    border: 1px solid #000000 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 2px 5px rgba(0, 0, 0, 0.3) !important;
+    margin-left: 8px !important;
+    display: inline-block !important;
 }
 
 #user-tools a:hover {
-    color: var(--accent-hover) !important;
-    text-decoration: underline !important;
+    background: linear-gradient(180deg, var(--accent-gold) 0%, #96743A 100%) !important;
+    color: #FFFFFF !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 4px 10px rgba(184, 149, 90, 0.4) !important;
+}
+
+.theme-toggle {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-left: 10px !important;
 }
 
 /* ==========================================
-   BREADCRUMBS
+   BREADCRUMBS (SKEUOMORPHIC EMBOSSED RIBBON)
 ========================================== */
 
 div.breadcrumbs {
-    background: #FFFFFF !important;
-    border-bottom: 1px solid var(--border-color) !important;
+    background: linear-gradient(180deg, #FFFFFF 0%, #EBEBE6 100%) !important;
+    border-bottom: 1px solid #D4D4CE !important;
+    box-shadow: 
+        inset 0 1px 0 #FFFFFF,
+        0 3px 8px rgba(0, 0, 0, 0.05) !important;
     padding: 12px 36px !important;
     font-family: var(--font-body) !important;
     font-size: 12px !important;
     letter-spacing: 1px !important;
-    color: #888888 !important;
+    color: #666666 !important;
 }
 
 div.breadcrumbs a {
     color: #111111 !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
+    text-shadow: 0 1px 0 #FFFFFF !important;
+}
+
+div.breadcrumbs a:hover {
+    color: var(--accent-gold) !important;
 }
 
 /* ==========================================
-   MAIN DASHBOARD LAYOUT & ARRANGEMENT
+   MAIN CONTENT CONTAINER & CARDS
 ========================================== */
 
-/* Hide duplicate left drawer sidebar on main dashboard index */
 .dashboard #nav-sidebar,
 .dashboard .toggle-nav-sidebar {
     display: none !important;
@@ -162,24 +200,182 @@ div.breadcrumbs a {
 .dashboard #main {
     margin-left: 0 !important;
     width: 100% !important;
+    background: transparent !important;
 }
 
 #content {
     padding: 36px 40px !important;
-    background: var(--body-bg) !important;
     max-width: 1440px !important;
     margin: 0 auto !important;
     box-sizing: border-box !important;
+    background: transparent !important;
 }
 
-.dashboard-welcome h1 {
+/* ==========================================
+   LUXURY SKEUOMORPHIC WELCOME BANNER
+========================================== */
+
+.dashboard-welcome-card {
+    background: var(--card-gradient) !important;
+    border: 1px solid #D8D6D0 !important;
+    border-radius: 16px !important;
+    padding: 32px 36px !important;
+    box-shadow: var(--skeuo-card-shadow) !important;
+    margin-bottom: 28px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 24px !important;
+}
+
+.welcome-header-left .welcome-tag {
+    font-family: var(--font-body) !important;
+    font-size: 11px !important;
+    letter-spacing: 3px !important;
+    color: var(--accent-gold) !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    background: rgba(184, 149, 90, 0.12) !important;
+    padding: 6px 14px !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(184, 149, 90, 0.3) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin-bottom: 12px !important;
+}
+
+.welcome-header-left h1 {
     font-family: var(--font-heading) !important;
     font-size: 36px !important;
-    font-weight: 500 !important;
+    font-weight: 600 !important;
     color: #111111 !important;
-    margin-top: 0 !important;
-    margin-bottom: 32px !important;
+    margin: 0 0 8px 0 !important;
     letter-spacing: 0.5px !important;
+    text-shadow: 0 1px 0 #FFFFFF !important;
+}
+
+.welcome-header-left p {
+    font-family: var(--font-body) !important;
+    font-size: 14px !important;
+    color: var(--text-muted) !important;
+    margin: 0 !important;
+}
+
+.welcome-header-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+}
+
+.skeuo-quick-btn {
+    font-family: var(--font-body) !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1.5px !important;
+    text-transform: uppercase !important;
+    padding: 10px 22px !important;
+    border-radius: 30px !important;
+    background: var(--button-secondary-gradient) !important;
+    color: #111111 !important;
+    border: 1px solid #C4C4BE !important;
+    box-shadow: inset 0 1px 0 #FFFFFF, 0 3px 8px rgba(0,0,0,0.1) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    transition: all 0.2s ease !important;
+}
+
+.skeuo-quick-btn.primary {
+    background: var(--button-gradient) !important;
+    color: #FFFFFF !important;
+    border-color: #000000 !important;
+    box-shadow: var(--skeuo-btn-shadow) !important;
+    text-shadow: 0 1px 2px #000000 !important;
+}
+
+.skeuo-quick-btn:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.2) !important;
+}
+
+/* ==========================================
+   SKEUOMORPHIC METRIC QUICK STAT CARDS
+========================================== */
+
+.skeuo-stats-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 20px !important;
+    margin-bottom: 32px !important;
+}
+
+.skeuo-stat-card {
+    background: var(--card-gradient) !important;
+    border: 1px solid #D8D6D0 !important;
+    border-radius: 14px !important;
+    padding: 20px 24px !important;
+    box-shadow: var(--skeuo-card-shadow) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+    position: relative !important;
+}
+
+.skeuo-stat-card:hover {
+    transform: translateY(-2px) !important;
+    border-color: var(--accent-gold) !important;
+    box-shadow: 0 14px 32px rgba(184, 149, 90, 0.2), inset 0 1px 0 #FFFFFF !important;
+}
+
+.stat-icon-wrapper {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 12px !important;
+    background: linear-gradient(180deg, #2D2D2D 0%, #111111 100%) !important;
+    color: var(--accent-gold) !important;
+    border: 1px solid #000000 !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 3px 8px rgba(0,0,0,0.25) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 18px !important;
+}
+
+.stat-info {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+}
+
+.stat-label {
+    font-family: var(--font-body) !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    letter-spacing: 2px !important;
+    color: var(--accent-gold) !important;
+    text-transform: uppercase !important;
+}
+
+.stat-title {
+    font-family: var(--font-body) !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    color: #111111 !important;
+    margin-top: 2px !important;
+}
+
+.stat-arrow {
+    font-size: 12px !important;
+    color: #AAAAAA !important;
+    transition: transform 0.2s ease !important;
+}
+
+.skeuo-stat-card:hover .stat-arrow {
+    color: var(--accent-gold) !important;
+    transform: translateX(3px) !important;
 }
 
 /* Flexbox Dashboard Grid */
@@ -190,6 +386,7 @@ div.breadcrumbs a {
     gap: 36px !important;
     width: 100% !important;
     box-sizing: border-box !important;
+    background: transparent !important;
 }
 
 .dashboard #content-main {
@@ -197,6 +394,9 @@ div.breadcrumbs a {
     width: auto !important;
     float: none !important;
     margin: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
 }
 
 .dashboard #content-related {
@@ -204,23 +404,24 @@ div.breadcrumbs a {
     width: 340px !important;
     float: none !important;
     margin: 0 !important;
-    background: #FFFFFF !important;
-    border: 1px solid var(--border-color) !important;
-    border-radius: 12px !important;
+    background: var(--card-gradient) !important;
+    border: 1px solid #D8D6D0 !important;
+    border-radius: 14px !important;
     padding: 28px !important;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.03) !important;
+    box-shadow: var(--skeuo-card-shadow) !important;
     box-sizing: border-box !important;
 }
 
 /* ==========================================
-   APP MODULE CARDS (#content-main)
+   SKEUOMORPHIC APP MODULE CARDS (#content-main)
 ========================================== */
 
-.dashboard .module {
-    background: #FFFFFF !important;
-    border: 1px solid var(--border-color) !important;
-    border-radius: 12px !important;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.03) !important;
+.dashboard .module,
+.module {
+    background: var(--card-gradient) !important;
+    border: 1px solid #D8D6D0 !important;
+    border-radius: 14px !important;
+    box-shadow: var(--skeuo-card-shadow) !important;
     margin-bottom: 32px !important;
     overflow: hidden !important;
 }
@@ -232,20 +433,23 @@ div.breadcrumbs a {
 }
 
 .dashboard .module caption, 
-.dashboard .module h2 {
-    background: #111111 !important;
+.dashboard .module h2,
+.module caption,
+.module h2 {
+    background: var(--primary-gradient) !important;
     color: #FFFFFF !important;
     font-family: var(--font-heading) !important;
-    font-size: 20px !important;
+    font-size: 22px !important;
     font-weight: 600 !important;
     letter-spacing: 2px !important;
     text-transform: uppercase !important;
     padding: 16px 28px !important;
     margin: 0 !important;
     text-align: left !important;
-    border-left: 4px solid var(--accent) !important;
+    border-bottom: 2px solid var(--accent-gold) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 2px 6px rgba(0,0,0,0.2) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important;
     white-space: nowrap !important;
-    word-break: normal !important;
 }
 
 .dashboard .module caption a,
@@ -257,8 +461,8 @@ div.breadcrumbs a {
 /* Table rows inside app modules */
 .dashboard .module tr {
     background: #FFFFFF !important;
-    border-bottom: 1px solid var(--border-color) !important;
-    transition: background 0.2s ease !important;
+    border-bottom: 1px solid #E8E6E0 !important;
+    transition: all 0.2s ease !important;
 }
 
 .dashboard .module tr:last-child {
@@ -266,19 +470,19 @@ div.breadcrumbs a {
 }
 
 .dashboard .module tr:hover {
-    background: var(--accent-light) !important;
+    background: linear-gradient(180deg, #FFFDF8 0%, #F5EFE4 100%) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), inset 0 -1px 0 rgba(184, 149, 90, 0.2) !important;
 }
 
 .dashboard .module th {
-    padding: 16px 24px !important;
+    padding: 18px 26px !important;
     vertical-align: middle !important;
     white-space: nowrap !important;
-    word-break: normal !important;
     min-width: 180px !important;
 }
 
 .dashboard .module td {
-    padding: 16px 24px !important;
+    padding: 18px 26px !important;
     vertical-align: middle !important;
     text-align: right !important;
     white-space: nowrap !important;
@@ -288,60 +492,125 @@ div.breadcrumbs a {
 .dashboard .module th a {
     font-family: var(--font-body) !important;
     font-size: 15px !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     color: #111111 !important;
     letter-spacing: 0.5px !important;
-    white-space: nowrap !important;
-    word-break: normal !important;
-    display: inline-block !important;
+    text-shadow: 0 1px 0 #FFFFFF !important;
 }
 
 .dashboard .module th a:hover {
-    color: var(--accent) !important;
+    color: var(--accent-gold) !important;
 }
 
-/* Add / Change Buttons in Table Rows */
+/* ==========================================
+   TACTILE SKEUOMORPHIC BUTTONS & LINKS
+========================================== */
+
 .dashboard .module td a.addlink,
 .dashboard .module td a.changelink,
-.dashboard .module td a.viewlink {
+.dashboard .module td a.viewlink,
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
     font-family: var(--font-body) !important;
     font-size: 11px !important;
-    font-weight: 600 !important;
-    letter-spacing: 1px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1.5px !important;
     text-transform: uppercase !important;
-    padding: 6px 16px !important;
-    border-radius: 20px !important;
+    padding: 8px 20px !important;
+    border-radius: 24px !important;
     display: inline-flex !important;
     align-items: center !important;
-    gap: 6px !important;
-    transition: all 0.2s ease !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease-in-out !important;
+    box-sizing: border-box !important;
     white-space: nowrap !important;
 }
 
-.dashboard .module td a.addlink {
-    background: #111111 !important;
+/* Primary Skeuomorphic Dark Buttons */
+.dashboard .module td a.addlink,
+.button, input[type=submit], input[type=button], .submit-row input[type=submit], a.button {
+    background: var(--button-gradient) !important;
     color: #FFFFFF !important;
-    border: 1px solid #111111 !important;
+    border: 1px solid #000000 !important;
+    box-shadow: var(--skeuo-btn-shadow) !important;
+    text-shadow: 0 1px 2px #000000 !important;
 }
 
-.dashboard .module td a.addlink:hover {
-    background: var(--accent) !important;
-    border-color: var(--accent) !important;
+.dashboard .module td a.addlink:hover,
+.button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input[type=submit]:hover, a.button:hover {
+    background: var(--button-hover-gradient) !important;
     color: #FFFFFF !important;
     transform: translateY(-1px) !important;
-    box-shadow: 0 3px 10px rgba(184, 149, 90, 0.3) !important;
+    box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.4), 
+        0 6px 16px rgba(0, 0, 0, 0.35) !important;
 }
 
-.dashboard .module td a.changelink {
-    background: transparent !important;
-    color: #555555 !important;
-    border: 1px solid var(--border-color) !important;
+.dashboard .module td a.addlink:active,
+.button:active, input[type=submit]:active, input[type=button]:active, .submit-row input[type=submit]:active, a.button:active {
+    transform: translateY(1px) !important;
+    box-shadow: 
+        inset 0 3px 6px rgba(0, 0, 0, 0.6), 
+        0 1px 2px rgba(0, 0, 0, 0.2) !important;
 }
 
-.dashboard .module td a.changelink:hover {
-    background: #111111 !important;
+/* Secondary Skeuomorphic Light Buttons (Change/View Links) */
+.dashboard .module td a.changelink,
+.dashboard .module td a.viewlink,
+.button.secondary, .submit-row a.deletelink {
+    background: var(--button-secondary-gradient) !important;
+    color: #222222 !important;
+    border: 1px solid #C4C4BE !important;
+    box-shadow: 
+        inset 0 1px 0 #FFFFFF, 
+        inset 0 -1px 0 #D0CEC8, 
+        0 2px 5px rgba(0, 0, 0, 0.1) !important;
+    text-shadow: 0 1px 0 #FFFFFF !important;
+}
+
+.dashboard .module td a.changelink:hover,
+.dashboard .module td a.viewlink:hover {
+    background: linear-gradient(180deg, #111111 0%, #2A2A2A 100%) !important;
     color: #FFFFFF !important;
-    border-color: #111111 !important;
+    border-color: #000000 !important;
+    text-shadow: 0 1px 1px #000000 !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 10px rgba(0,0,0,0.25) !important;
+}
+
+/* ==========================================
+   ENGRAVED SKEUOMORPHIC FORM INPUTS
+========================================== */
+
+input[type=text], input[type=password], input[type=email], input[type=url], 
+input[type=number], input[type=tel], textarea, select {
+    background: var(--input-bg-gradient) !important;
+    color: #111111 !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 11px 16px !important;
+    font-family: var(--font-body) !important;
+    font-size: 14px !important;
+    box-shadow: var(--skeuo-input-shadow) !important;
+    transition: all 0.2s ease !important;
+    box-sizing: border-box !important;
+}
+
+input[type=text]:focus, input[type=password]:focus, input[type=email]:focus, 
+textarea:focus, select:focus {
+    background: #FFFFFF !important;
+    box-shadow: 
+        inset 0 2px 4px rgba(0, 0, 0, 0.18), 
+        inset 0 0 0 2px #111111, 
+        0 0 10px rgba(0, 0, 0, 0.1) !important;
+    outline: none !important;
+}
+
+/* Checkboxes & Radios */
+input[type=checkbox], input[type=radio] {
+    accent-color: #111111 !important;
+    transform: scale(1.15) !important;
+    cursor: pointer !important;
 }
 
 /* ==========================================
@@ -351,17 +620,15 @@ div.breadcrumbs a {
 #content-related h2, 
 #content-related h3 {
     font-family: var(--font-heading) !important;
-    font-size: 20px !important;
+    font-size: 22px !important;
     font-weight: 600 !important;
     color: #111111 !important;
     letter-spacing: 1px !important;
     margin-top: 0 !important;
     margin-bottom: 20px !important;
     padding-bottom: 12px !important;
-    border-bottom: 2px solid var(--accent) !important;
-    background: transparent !important;
-    white-space: nowrap !important;
-    word-break: normal !important;
+    border-bottom: 2px solid var(--accent-gold) !important;
+    text-shadow: 0 1px 0 #FFFFFF !important;
     text-transform: uppercase !important;
 }
 
@@ -380,8 +647,8 @@ div.breadcrumbs a {
 }
 
 #content-related ul.actionlist li {
-    padding: 12px 0 !important;
-    border-bottom: 1px solid var(--border-color) !important;
+    padding: 14px 0 !important;
+    border-bottom: 1px solid #E0DFD8 !important;
     font-family: var(--font-body) !important;
     font-size: 13px !important;
     color: var(--text-muted) !important;
@@ -394,54 +661,57 @@ div.breadcrumbs a {
 
 #content-related ul.actionlist li a {
     color: #111111 !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
+    text-shadow: 0 1px 0 #FFFFFF !important;
 }
 
 #content-related ul.actionlist li a:hover {
-    color: var(--accent) !important;
+    color: var(--accent-gold) !important;
 }
 
-#content-related .mini {
-    font-size: 11px !important;
-    color: #888888 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
-}
-
-/* Action Badges in Recent Activity */
+/* Tactile 3D Action Badges */
 #content-related span.mini {
-    background: var(--accent-light) !important;
-    color: var(--accent) !important;
-    padding: 2px 8px !important;
-    border-radius: 4px !important;
-    font-weight: 600 !important;
+    background: linear-gradient(180deg, #FFFFFF 0%, #EBEBE6 100%) !important;
+    color: #222222 !important;
+    border: 1px solid #CCCCCC !important;
+    padding: 3px 10px !important;
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+    box-shadow: inset 0 1px 0 #FFFFFF, 0 2px 4px rgba(0,0,0,0.08) !important;
+    display: inline-block !important;
+    margin-top: 4px !important;
 }
 
 /* ==========================================
-   MODEL LIST VIEW & FORMS (#result_list)
+   MODEL LIST TABLE VIEW (#result_list)
 ========================================== */
 
 #result_list {
     width: 100% !important;
     background: #FFFFFF !important;
-    border: 1px solid var(--border-color) !important;
-    border-radius: 12px !important;
+    border: 1px solid #D8D6D0 !important;
+    border-radius: 14px !important;
     overflow: hidden !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+    box-shadow: var(--skeuo-card-shadow) !important;
     border-collapse: separate !important;
     border-spacing: 0 !important;
 }
 
 #result_list th {
-    background: #F5F4F0 !important;
-    color: #111111 !important;
+    background: var(--primary-gradient) !important;
+    color: #FFFFFF !important;
     font-family: var(--font-body) !important;
     font-size: 11px !important;
     font-weight: 700 !important;
     letter-spacing: 1.5px !important;
     text-transform: uppercase !important;
-    padding: 16px 20px !important;
-    border-bottom: 2px solid var(--border-color) !important;
+    padding: 18px 20px !important;
+    border-bottom: 2px solid var(--accent-gold) !important;
+    text-shadow: 0 1px 2px #000000 !important;
+}
+
+#result_list th a {
+    color: #FFFFFF !important;
 }
 
 #result_list tr:nth-child(odd) {
@@ -449,222 +719,159 @@ div.breadcrumbs a {
 }
 
 #result_list tr:nth-child(even) {
-    background: #FAF9F6 !important;
+    background: #F9F8F5 !important;
 }
 
 #result_list tr:hover {
-    background: var(--accent-light) !important;
+    background: linear-gradient(180deg, #FFFDF8 0%, #F5EFE4 100%) !important;
 }
 
 #result_list td {
     padding: 16px 20px !important;
     font-size: 14px !important;
-    border-bottom: 1px solid var(--border-color) !important;
+    border-bottom: 1px solid #E8E6E0 !important;
 }
 
-/* Search bar */
+/* Search Toolbar */
 #toolbar, #changelist-search {
-    background: #FFFFFF !important;
-    border: 1px solid var(--border-color) !important;
-    border-radius: 10px !important;
-    padding: 16px 24px !important;
+    background: var(--card-gradient) !important;
+    border: 1px solid #D8D6D0 !important;
+    border-radius: 12px !important;
+    padding: 18px 26px !important;
     margin-bottom: 24px !important;
-}
-
-/* Buttons */
-.button, input[type=submit], input[type=button], .submit-row input, a.button {
-    background: #111111 !important;
-    color: #FFFFFF !important;
-    border: 1px solid #111111 !important;
-    border-radius: 30px !important;
-    padding: 10px 24px !important;
-    font-family: var(--font-body) !important;
-    font-size: 12px !important;
-    font-weight: 600 !important;
-    letter-spacing: 1.5px !important;
-    text-transform: uppercase !important;
-    cursor: pointer !important;
-    transition: all 0.25s ease !important;
-}
-
-.button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover {
-    background: var(--accent) !important;
-    border-color: var(--accent) !important;
-    color: #FFFFFF !important;
-    box-shadow: 0 4px 14px rgba(184, 149, 90, 0.35) !important;
-}
-
-/* Forms */
-form .form-row {
-    padding: 18px 24px !important;
-    border-bottom: 1px solid var(--border-color) !important;
-}
-
-input[type=text], input[type=password], input[type=email], input[type=url], 
-input[type=number], input[type=tel], textarea, select {
-    border: 1px solid var(--border-color) !important;
-    border-radius: 6px !important;
-    padding: 10px 14px !important;
-    font-family: var(--font-body) !important;
-    font-size: 14px !important;
-    background: #FFFFFF !important;
-    color: #111111 !important;
-}
-
-input[type=text]:focus, textarea:focus, select:focus {
-    border-color: var(--accent) !important;
-    box-shadow: 0 0 0 3px rgba(184, 149, 90, 0.2) !important;
-    outline: none !important;
+    box-shadow: var(--skeuo-card-shadow) !important;
 }
 
 /* ==========================================
-   RESPONSIVE MEDIA QUERIES FOR ADMIN THEME
+   ADMIN LOGIN PAGE (.login)
 ========================================== */
 
-/* Laptop & Tablet  ≤1024px */
-@media (max-width: 1024px) {
+body.login {
+    background: linear-gradient(180deg, #1A1A1A 0%, #0A0A0A 100%) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 100vh !important;
+}
 
+body.login #container {
+    background: transparent !important;
+    border: none !important;
+    width: 100% !important;
+    max-width: 440px !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
+}
+
+body.login #header {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    justify-content: center !important;
+    padding-bottom: 24px !important;
+}
+
+body.login #content {
+    background: var(--card-gradient) !important;
+    border: 1px solid #D8D6D0 !important;
+    border-radius: 18px !important;
+    padding: 40px 36px !important;
+    box-shadow: 
+        0 20px 50px rgba(0, 0, 0, 0.6), 
+        inset 0 1px 0 #FFFFFF, 
+        inset 0 -1px 0 #D8D6D0 !important;
+    max-width: 440px !important;
+    margin: 0 auto !important;
+}
+
+body.login #content h1 {
+    font-family: var(--font-heading) !important;
+    font-size: 32px !important;
+    font-weight: 600 !important;
+    color: #111111 !important;
+    text-align: center !important;
+    margin-bottom: 24px !important;
+    text-shadow: 0 1px 0 #FFFFFF !important;
+}
+
+body.login .form-row {
+    margin-bottom: 20px !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
+body.login .form-row label {
+    font-family: var(--font-body) !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+    color: #333333 !important;
+    margin-bottom: 8px !important;
+    display: block !important;
+}
+
+body.login input[type=text], 
+body.login input[type=password] {
+    width: 100% !important;
+}
+
+body.login .submit-row {
+    padding: 10px 0 0 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+body.login .submit-row input {
+    width: 100% !important;
+    padding: 14px 24px !important;
+    font-size: 13px !important;
+    margin-top: 10px !important;
+}
+
+/* ==========================================
+   RESPONSIVE MEDIA QUERIES
+========================================== */
+
+@media (max-width: 1200px) {
+    .skeuo-stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 1024px) {
     #header {
         padding: 12px 20px !important;
         flex-wrap: wrap !important;
-        gap: 12px !important;
     }
-
-    .admin-logo-img {
-        height: 32px !important;
-    }
-
-    .admin-brand-tag {
-        font-size: 9px !important;
-        letter-spacing: 2px !important;
-        padding-left: 10px !important;
-    }
-
-    #user-tools {
-        font-size: 10px !important;
-    }
-
     #content {
         padding: 24px 20px !important;
     }
-
-    .dashboard #content-main {
-        float: none !important;
-        width: 100% !important;
-        margin-bottom: 24px !important;
+    .dashboard-welcome-card {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        padding: 24px !important;
     }
-
+    .dashboard #content-main,
     .dashboard #content-related {
         float: none !important;
         width: 100% !important;
     }
-
-    #changelist {
-        flex-direction: column !important;
-    }
-
-    #changelist-filter {
-        width: 100% !important;
-        margin-top: 20px !important;
-    }
-
 }
 
-/* Large Mobile  ≤768px */
-@media (max-width: 768px) {
+@media (max-width: 640px) {
+    .skeuo-stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
 
+@media (max-width: 768px) {
     #header {
         flex-direction: column !important;
         align-items: flex-start !important;
     }
-
     #user-tools {
-        width: 100% !important;
-        margin-top: 4px !important;
+        margin-top: 8px !important;
     }
-
-    div.breadcrumbs {
-        padding: 10px 20px !important;
-        font-size: 11px !important;
-    }
-
-    #content h1 {
-        font-size: 26px !important;
-        margin-bottom: 20px !important;
-    }
-
-    .dashboard .module th, 
-    .dashboard .module td {
-        padding: 12px 16px !important;
-    }
-
-    .dashboard .module td {
-        display: flex !important;
-        justify-content: flex-end !important;
-        gap: 8px !important;
-    }
-
-    /* Make table horizontally scrollable */
-    #result_list {
-        display: block !important;
-        overflow-x: auto !important;
-        white-space: nowrap !important;
-    }
-
-    #changelist-search input[type=text] {
-        min-width: 100% !important;
-        box-sizing: border-box !important;
-        margin-bottom: 10px !important;
-    }
-
-    #changelist-search input[type=submit] {
-        margin-left: 0 !important;
-        width: 100% !important;
-    }
-
-    .submit-row {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 10px !important;
-    }
-
-    .submit-row input, .submit-row a {
-        width: 100% !important;
-        text-align: center !important;
-        box-sizing: border-box !important;
-    }
-
-}
-
-/* Small Mobile  ≤480px */
-@media (max-width: 480px) {
-
-    #content {
-        padding: 16px 12px !important;
-    }
-
-    .admin-logo-img {
-        height: 28px !important;
-    }
-
-    .admin-brand-tag {
-        display: none !important;
-    }
-
-    .dashboard .module caption, 
-    .dashboard .module h2 {
-        font-size: 16px !important;
-        padding: 10px 16px !important;
-    }
-
-    .dashboard .module th a {
-        font-size: 13px !important;
-    }
-
-    .dashboard .module td a.addlink, 
-    .dashboard .module td a.changelink {
-        padding: 4px 10px !important;
-        font-size: 10px !important;
-    }
-
 }

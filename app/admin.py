@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Category, Product, ProductImage, Order, OrderItem, Review
+from .models import Category, Product, ProductImage, Order, OrderItem, Review, UserProfile
+
 
 # Admin Panel Custom Branding
 admin.site.site_header = "LINO PARFUMS • ADMIN"
@@ -286,3 +287,13 @@ class ReviewAdmin(admin.ModelAdmin):
         queryset.update(is_approved=False)
         self.message_user(request, "Selected reviews hidden.")
     disapprove_reviews.short_description = "Hide selected reviews"
+
+
+# ==================================================
+# USER PROFILE ADMIN
+# ==================================================
+
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ("user", "phone", "city", "state", "pincode", "created_at")
+    search_fields = ("user__username", "user__email", "user__first_name", "user__last_name", "phone", "city")

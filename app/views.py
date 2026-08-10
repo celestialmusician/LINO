@@ -225,10 +225,16 @@ class CheckoutView(View):
 
         initial = {}
         if request.user.is_authenticated:
+            profile = getattr(request.user, 'profile', None)
             initial = {
                 'first_name': request.user.first_name,
                 'last_name': request.user.last_name,
                 'email': request.user.email,
+                'phone': profile.phone if profile else '',
+                'address': profile.address if profile else '',
+                'city': profile.city if profile else '',
+                'state': profile.state if profile else '',
+                'pincode': profile.pincode if profile else '',
             }
 
         form = CheckoutForm(initial=initial)
@@ -269,6 +275,14 @@ class CheckoutView(View):
                 order = form.save(commit=False)
                 if request.user.is_authenticated:
                     order.user = request.user
+                    profile = getattr(request.user, 'profile', None)
+                    if profile:
+                        if order.phone: profile.phone = order.phone
+                        if order.address: profile.address = order.address
+                        if order.city: profile.city = order.city
+                        if order.state: profile.state = order.state
+                        if order.pincode: profile.pincode = order.pincode
+                        profile.save()
                 order.total = 0  # Will be calculated securely on server
                 order.save()
 
@@ -512,9 +526,14 @@ class ProfileView(LoginRequiredMixin, View):
 
     def get(self, request):
         orders = Order.objects.filter(user=request.user).order_by("-created_at")
+        phone = ""
+        if hasattr(request.user, 'profile'):
+            phone = request.user.profile.phone
+
         form = UserProfileForm(initial={
             'full_name': request.user.get_full_name() or request.user.username,
             'email': request.user.email,
+            'phone': phone,
         })
         return render(
             request,
@@ -533,12 +552,17 @@ class ProfileView(LoginRequiredMixin, View):
         if form.is_valid():
             full_name = form.cleaned_data['full_name']
             email = form.cleaned_data['email'].strip().lower()
+            phone = form.cleaned_data.get('phone', '').strip()
 
             name_parts = full_name.split(" ", 1)
             request.user.first_name = name_parts[0]
             request.user.last_name = name_parts[1] if len(name_parts) > 1 else ""
             request.user.email = email
             request.user.save()
+
+            if hasattr(request.user, 'profile'):
+                request.user.profile.phone = phone
+                request.user.profile.save()
 
             messages.success(request, "Your profile details have been updated successfully.")
             return redirect("profile")
@@ -675,6 +699,11 @@ class RegisterView(View):
                 first_name=first_name,
                 last_name=last_name,
             )
+
+            phone = form.cleaned_data.get('phone', '').strip()
+            if phone and hasattr(user, 'profile'):
+                user.profile.phone = phone
+                user.profile.save()
 
             login(request, user)
             next_url = request.POST.get("next") or request.GET.get("next") or reverse("checkout")

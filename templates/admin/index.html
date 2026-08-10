@@ -4,8 +4,57 @@
 {% block bodyclass %}{{ block.super }} dashboard{% endblock %}
 
 {% block content %}
-<div class="dashboard-welcome">
-    <h1>Welcome to LINO Luxury Fragrance Management</h1>
+<!-- Premium Skeuomorphic Header Banner -->
+<div class="dashboard-welcome-card">
+    <div class="welcome-header-left">
+        <span class="welcome-tag"><i class="fa-solid fa-crown"></i> LINO PARFUMS LUXURY STUDIO</span>
+        <h1>Atelier Fragrance Management</h1>
+        <p>Manage luxury products, customer orders, client profiles, and verified reviews with precision.</p>
+    </div>
+    <div class="welcome-header-actions">
+        <a href="/" target="_blank" class="skeuo-quick-btn">
+            <i class="fa-solid fa-store"></i> Storefront
+        </a>
+        <a href="{% url 'admin:app_product_add' %}" class="skeuo-quick-btn primary">
+            <i class="fa-solid fa-plus"></i> Add Product
+        </a>
+    </div>
+</div>
+
+<!-- Skeuomorphic Metric Quick Stat Grid -->
+<div class="skeuo-stats-grid">
+    <a href="{% url 'admin:app_product_changelist' %}" class="skeuo-stat-card">
+        <div class="stat-icon-wrapper"><i class="fa-solid fa-spray-can-sparkles"></i></div>
+        <div class="stat-info">
+            <span class="stat-label">CATALOG</span>
+            <span class="stat-title">Products & Fragrances</span>
+        </div>
+        <i class="fa-solid fa-chevron-right stat-arrow"></i>
+    </a>
+    <a href="{% url 'admin:app_order_changelist' %}" class="skeuo-stat-card">
+        <div class="stat-icon-wrapper"><i class="fa-solid fa-bag-shopping"></i></div>
+        <div class="stat-info">
+            <span class="stat-label">SALES</span>
+            <span class="stat-title">Customer Orders</span>
+        </div>
+        <i class="fa-solid fa-chevron-right stat-arrow"></i>
+    </a>
+    <a href="{% url 'admin:app_userprofile_changelist' %}" class="skeuo-stat-card">
+        <div class="stat-icon-wrapper"><i class="fa-solid fa-user-shield"></i></div>
+        <div class="stat-info">
+            <span class="stat-label">CLIENTS</span>
+            <span class="stat-title">User Profiles & Phone DB</span>
+        </div>
+        <i class="fa-solid fa-chevron-right stat-arrow"></i>
+    </a>
+    <a href="{% url 'admin:app_review_changelist' %}" class="skeuo-stat-card">
+        <div class="stat-icon-wrapper"><i class="fa-solid fa-star"></i></div>
+        <div class="stat-info">
+            <span class="stat-label">FEEDBACK</span>
+            <span class="stat-title">Reviews & Ratings</span>
+        </div>
+        <i class="fa-solid fa-chevron-right stat-arrow"></i>
+    </a>
 </div>
 
 <div class="dashboard-container">
@@ -18,7 +67,7 @@
     <!-- Right Recent Activity Sidebar -->
     <div id="content-related">
         <div class="module" id="recent-actions-module">
-            <h2>{% translate 'Recent Activity' %}</h2>
+            <h2><i class="fa-solid fa-clock-rotate-left"></i> {% translate 'Recent Activity' %}</h2>
             <h3>{% translate 'My Actions' %}</h3>
             {% load log %}
             {% get_admin_log 10 as admin_log for_user user %}
@@ -50,3 +99,4 @@
 {% endblock %}
 
 {% block sidebar %}{% endblock %}
+
