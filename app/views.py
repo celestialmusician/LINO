@@ -767,8 +767,10 @@ class ForgotPasswordView(View):
                 email_sent = send_otp_email(user, otp_code, purpose="password_reset")
 
                 if email_sent:
+                    request.session.pop('latest_otp', None)
                     messages.success(request, f"A 6-digit OTP code has been sent to {email}. Check your inbox.")
                 else:
+                    request.session['latest_otp'] = otp_code
                     messages.success(request, f"A 6-digit OTP code has been generated for {email}.")
 
                 return redirect("verify_otp")
