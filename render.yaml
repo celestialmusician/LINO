@@ -9,3 +9,17 @@ services:
         value: 3.12.0
       - key: DEBUG
         value: False
+      - key: EMAIL_BACKEND
+        value: django.core.mail.backends.smtp.EmailBackend
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_PORT
+        value: "465"
+      - key: EMAIL_USE_SSL
+        value: "True"
+      - key: EMAIL_HOST_USER
+        value: mylino2026@gmail.com
+      - key: EMAIL_HOST_PASSWORD
+        value: wjhz gmbf ivjj ylhe
+      - key: DEFAULT_FROM_EMAIL
+        value: LINO Atelier <mylino2026@gmail.com>

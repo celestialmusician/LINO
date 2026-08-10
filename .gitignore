@@ -21,3 +21,6 @@ db.sqlite3
 
 # Static files
 staticfiles/
+
+# Logs
+logs/
