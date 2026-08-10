@@ -757,25 +757,13 @@ class ForgotPasswordView(View):
             user = User.objects.filter(email__iexact=email).first()
 
             if user:
-                otp_code = generate_otp()
-                PasswordResetOTP.objects.filter(user=user, is_used=False).update(is_used=True)
-                PasswordResetOTP.objects.create(user=user, otp_code=otp_code)
-
+                # OTP verification disabled (live): skip email/OTP step entirely
+                # and let the user set a new password immediately.
                 request.session['reset_email'] = email
-                request.session['latest_otp'] = otp_code
+                request.session['otp_verified_user_id'] = user.id
 
-                email_sent = send_otp_email(user, otp_code, purpose="password_reset")
-                if not getattr(settings, "SHOW_TEST_OTP", False):
-                    request.session.pop('latest_otp', None)
-                else:
-                    request.session['latest_otp'] = otp_code
-
-                if email_sent:
-                    messages.success(request, f"A 6-digit OTP code has been sent to {email}. Please check your inbox and Spam/Junk folder.")
-                else:
-                    messages.error(request, f"Failed to send OTP email to {email}. Please check server settings or try again.")
-
-                return redirect("verify_otp")
+                messages.success(request, "Please enter your new password.")
+                return redirect("set_new_password")
 
             messages.error(request, "No registered account was found with that email address.")
             return render(request, self.template_name, {"form": form})
@@ -953,38 +941,22 @@ class ResetPasswordConfirmView(View):
 
 class ChangePasswordView(LoginRequiredMixin, View):
     """
-    Step 1: Validate current password → send OTP to email.
-    Actual password change happens in VerifyChangePasswordOTPView (Step 2).
+    Validates current password and applies the new password immediately.
+    (OTP email-verification step removed for live use.)
     """
     login_url = "/login/"
 
     def post(self, request):
         form = ChangePasswordForm(user=request.user, data=request.POST)
         if form.is_valid():
-            # Generate OTP and send to user's email
-            otp_code = generate_otp()
-            ChangePasswordOTP.objects.filter(user=request.user, is_used=False).update(is_used=True)
-            ChangePasswordOTP.objects.create(user=request.user, otp_code=otp_code)
+            # OTP verification disabled (live): apply the new password
+            # immediately instead of emailing an OTP first.
+            request.user.set_password(form.cleaned_data['new_password'])
+            request.user.save()
+            update_session_auth_hash(request, request.user)
 
-            # Store new password (hashed) temporarily in session
-            from django.contrib.auth.hashers import make_password
-            request.session['change_pw_new_hash'] = make_password(form.cleaned_data['new_password'])
-
-            email_sent = send_otp_email(request.user, otp_code, purpose="change_password")
-            request.session.pop('change_pw_otp', None)
-
-            if email_sent:
-                messages.success(
-                    request,
-                    f"An OTP code has been sent to {request.user.email}. Enter it below to confirm your password change."
-                )
-            else:
-                messages.error(
-                    request,
-                    f"Failed to send OTP email to {request.user.email}. Please try again."
-                )
-
-            return redirect("verify_change_password_otp")
+            messages.success(request, "Your password has been changed successfully!")
+            return redirect("profile")
 
         # Form invalid — return to profile with errors
         orders = Order.objects.filter(user=request.user).order_by("-created_at")
