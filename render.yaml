@@ -14,12 +14,14 @@ services:
       - key: EMAIL_HOST
         value: smtp.gmail.com
       - key: EMAIL_PORT
-        value: "465"
-      - key: EMAIL_USE_SSL
+        value: "587"
+      - key: EMAIL_USE_TLS
         value: "True"
+      - key: EMAIL_USE_SSL
+        value: "False"
       - key: EMAIL_HOST_USER
         value: mylino2026@gmail.com
       - key: EMAIL_HOST_PASSWORD
-        value: wjhz gmbf ivjj ylhe
+        value: wjhzgmbfivjjylhe
       - key: DEFAULT_FROM_EMAIL
         value: LINO Atelier <mylino2026@gmail.com>

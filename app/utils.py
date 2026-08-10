@@ -7,12 +7,15 @@ import json
 import urllib.request
 import secrets
 import threading
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.conf import settings
 
 
 def _send_email_async(subject, plain_body, from_email, target_email, html_body):
-    """Worker thread to dispatch email asynchronously via Resend/Brevo API or SMTP."""
+    """Worker thread to dispatch email asynchronously via Resend/Brevo API, Django SMTP, or Direct SMTPLib."""
     resend_key = getattr(settings, "RESEND_API_KEY", "")
     brevo_key = getattr(settings, "BREVO_API_KEY", "")
 
@@ -63,7 +66,7 @@ def _send_email_async(subject, plain_body, from_email, target_email, html_body):
         except Exception as exc:
             print(f"[LINO BREVO API ERROR] {target_email}: {exc}")
 
-    # 3. Fallback to standard SMTP (Gmail / configured backend)
+    # 3. Try standard Django EmailBackend
     try:
         connection = get_connection(fail_silently=False, timeout=10)
         msg = EmailMultiAlternatives(
@@ -75,9 +78,50 @@ def _send_email_async(subject, plain_body, from_email, target_email, html_body):
         )
         msg.attach_alternative(html_body, "text/html")
         msg.send(fail_silently=False)
-        print(f"[LINO EMAIL SUCCESS via SMTP] OTP sent to {target_email}")
+        print(f"[LINO EMAIL SUCCESS via Django SMTP] OTP sent to {target_email}")
+        return
     except Exception as exc:
-        print(f"[LINO EMAIL ERROR via SMTP] {target_email}: {exc}")
+        print(f"[LINO DJANGO SMTP WARNING] {target_email}: {exc}. Retrying with direct smtplib...")
+
+    # 4. Direct smtplib fallback (Port 587 TLS & Port 465 SSL)
+    smtp_user = getattr(settings, "EMAIL_HOST_USER", "") or "mylino2026@gmail.com"
+    smtp_pass = (getattr(settings, "EMAIL_HOST_PASSWORD", "") or "wjhzgmbfivjjylhe").replace(' ', '').strip()
+
+    if smtp_user and smtp_pass:
+        # 4a. Try Port 587 (TLS)
+        try:
+            msg = MIMEMultipart("alternative")
+            msg["Subject"] = subject
+            msg["From"] = from_email
+            msg["To"] = target_email
+            msg.attach(MIMEText(plain_body, "plain"))
+            msg.attach(MIMEText(html_body, "html"))
+
+            with smtplib.SMTP("smtp.gmail.com", 587, timeout=10) as server:
+                server.starttls()
+                server.login(smtp_user, smtp_pass)
+                server.sendmail(smtp_user, [target_email], msg.as_string())
+            print(f"[LINO EMAIL SUCCESS via SMTPLIB 587 TLS] OTP sent to {target_email}")
+            return
+        except Exception as exc587:
+            print(f"[LINO SMTPLIB 587 ERROR] {target_email}: {exc587}")
+
+        # 4b. Try Port 465 (SSL)
+        try:
+            msg = MIMEMultipart("alternative")
+            msg["Subject"] = subject
+            msg["From"] = from_email
+            msg["To"] = target_email
+            msg.attach(MIMEText(plain_body, "plain"))
+            msg.attach(MIMEText(html_body, "html"))
+
+            with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as server:
+                server.login(smtp_user, smtp_pass)
+                server.sendmail(smtp_user, [target_email], msg.as_string())
+            print(f"[LINO EMAIL SUCCESS via SMTPLIB 465 SSL] OTP sent to {target_email}")
+            return
+        except Exception as exc465:
+            print(f"[LINO SMTPLIB 465 ERROR] {target_email}: {exc465}")
 
 
 # ─────────────────────────────────────────────────────────────────
