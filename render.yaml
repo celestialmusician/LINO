@@ -25,3 +25,7 @@ services:
         value: wjhzgmbfivjjylhe
       - key: DEFAULT_FROM_EMAIL
         value: LINO Atelier <mylino2026@gmail.com>
+      - key: BREVO_API_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
