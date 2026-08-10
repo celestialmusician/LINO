@@ -33,15 +33,6 @@
             </div>
             {% endif %}
 
-            {% if latest_otp %}
-            <div id="devOtpBox" title="Click to auto-fill OTP" style="background: #faf6f0; border: 1.5px dashed #b8955a; padding: 14px; border-radius: 16px; margin-bottom: 24px; cursor: pointer; transition: transform 0.2s ease;">
-                <p style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #92400e; margin-bottom: 4px;">
-                    ⚡ [LIVE TEST OTP - CLICK TO FILL]
-                </p>
-                <div id="devOtpCode" style="font-size: 1.9rem; font-weight: 800; letter-spacing: 10px; color: #b8955a; font-family: system-ui, -apple-system, sans-serif;">{{ latest_otp }}</div>
-            </div>
-            {% endif %}
-
             <form method="POST" action="{% url 'verify_otp' %}" id="otpForm">
 
                 {% csrf_token %}
@@ -96,8 +87,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const digitInputs = document.querySelectorAll(".otp-digit-box");
     const finalInput = document.getElementById("finalOtpInput");
     const form = document.getElementById("otpForm");
-    const devOtpBox = document.getElementById("devOtpBox");
-    const devOtpCode = document.getElementById("devOtpCode");
 
     // Handle typing and auto-advancing
     digitInputs.forEach((input, index) => {
@@ -154,16 +143,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 form.submit();
             }, 150);
         }
-    }
-
-    // Dev mode click to fill OTP
-    if (devOtpBox && devOtpCode) {
-        devOtpBox.addEventListener("click", function() {
-            const codeText = devOtpCode.textContent.trim();
-            fillOtpDigits(codeText);
-            devOtpBox.style.transform = "scale(0.98)";
-            setTimeout(() => devOtpBox.style.transform = "scale(1)", 150);
-        });
     }
 
     // 60-second countdown timer

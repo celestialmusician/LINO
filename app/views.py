@@ -765,13 +765,12 @@ class ForgotPasswordView(View):
                 request.session['latest_otp'] = otp_code
 
                 email_sent = send_otp_email(user, otp_code, purpose="password_reset")
+                request.session.pop('latest_otp', None)
 
                 if email_sent:
-                    request.session.pop('latest_otp', None)
-                    messages.success(request, f"A 6-digit OTP code has been sent to {email}. Check your inbox.")
+                    messages.success(request, f"A 6-digit OTP code has been sent to {email}. Please check your inbox and Spam/Junk folder.")
                 else:
-                    request.session['latest_otp'] = otp_code
-                    messages.success(request, f"A 6-digit OTP code has been generated for {email}.")
+                    messages.error(request, f"Failed to send OTP email to {email}. Please check server settings or try again.")
 
                 return redirect("verify_otp")
 
@@ -790,11 +789,9 @@ class VerifyOTPView(View):
             messages.error(request, "Please enter your email to request a password reset OTP.")
             return redirect("forgot_password")
         form = VerifyOTPForm()
-        latest_otp = request.session.get('latest_otp')
         return render(request, self.template_name, {
             "form": form,
             "email": email,
-            "latest_otp": latest_otp
         })
 
     def post(self, request):
@@ -834,11 +831,9 @@ class VerifyOTPView(View):
                 messages.error(request, "Account not found. Please restart the reset process.")
                 return redirect("forgot_password")
 
-        latest_otp = request.session.get('latest_otp')
         return render(request, self.template_name, {
             "form": form,
             "email": email,
-            "latest_otp": latest_otp
         })
 
 
@@ -855,14 +850,14 @@ class ResendOTPView(View):
             otp_code = generate_otp()
             PasswordResetOTP.objects.filter(user=user, is_used=False).update(is_used=True)
             PasswordResetOTP.objects.create(user=user, otp_code=otp_code)
-            request.session['latest_otp'] = otp_code
 
             email_sent = send_otp_email(user, otp_code, purpose="password_reset")
+            request.session.pop('latest_otp', None)
 
             if email_sent:
-                messages.success(request, f"A new 6-digit OTP code has been sent to {email}.")
+                messages.success(request, f"A new 6-digit OTP code has been sent to {email}. Check your inbox and Spam folder.")
             else:
-                messages.success(request, f"A new 6-digit OTP code has been generated for {email}.")
+                messages.error(request, f"Failed to send OTP email to {email}. Please try again later.")
         else:
             messages.error(request, "User not found.")
 
@@ -964,9 +959,9 @@ class ChangePasswordView(LoginRequiredMixin, View):
             # Store new password (hashed) temporarily in session
             from django.contrib.auth.hashers import make_password
             request.session['change_pw_new_hash'] = make_password(form.cleaned_data['new_password'])
-            request.session['change_pw_otp']      = otp_code
 
             email_sent = send_otp_email(request.user, otp_code, purpose="change_password")
+            request.session.pop('change_pw_otp', None)
 
             if email_sent:
                 messages.success(
@@ -974,9 +969,9 @@ class ChangePasswordView(LoginRequiredMixin, View):
                     f"An OTP code has been sent to {request.user.email}. Enter it below to confirm your password change."
                 )
             else:
-                messages.success(
+                messages.error(
                     request,
-                    f"An OTP code has been generated for {request.user.email}. Enter it below to confirm your password change."
+                    f"Failed to send OTP email to {request.user.email}. Please try again."
                 )
 
             return redirect("verify_change_password_otp")
@@ -1016,13 +1011,11 @@ class VerifyChangePasswordOTPView(LoginRequiredMixin, View):
             return redirect("profile")
         return render(request, self.template_name, {
             "email": request.user.email,
-            "latest_otp": request.session.get('change_pw_otp')
         })
 
     def post(self, request):
         otp_entered  = request.POST.get("otp_code", "").strip()
         new_pw_hash  = request.session.get('change_pw_new_hash')
-        session_otp  = request.session.get('change_pw_otp')
 
         if not new_pw_hash:
             messages.error(request, "Session expired. Please try again.")
@@ -1054,19 +1047,18 @@ class VerifyChangePasswordOTPView(LoginRequiredMixin, View):
         messages.error(request, "Invalid or expired OTP. Please try again.")
         return render(request, self.template_name, {
             "email": request.user.email,
-            "latest_otp": session_otp
         })
 
     def _handle_resend(self, request):
         otp_code = generate_otp()
         ChangePasswordOTP.objects.filter(user=request.user, is_used=False).update(is_used=True)
         ChangePasswordOTP.objects.create(user=request.user, otp_code=otp_code)
-        request.session['change_pw_otp'] = otp_code
         email_sent = send_otp_email(request.user, otp_code, purpose="change_password")
+        request.session.pop('change_pw_otp', None)
         if email_sent:
             messages.success(request, "A new OTP has been sent to your email.")
         else:
-            messages.warning(request, f"Email failed. (Dev OTP: {otp_code})")
+            messages.error(request, "Failed to send OTP email. Please try again.")
         return redirect("verify_change_password_otp")
 
 
@@ -1086,12 +1078,12 @@ class ResendChangePasswordOTPView(LoginRequiredMixin, View):
         otp_code = generate_otp()
         ChangePasswordOTP.objects.filter(user=request.user, is_used=False).update(is_used=True)
         ChangePasswordOTP.objects.create(user=request.user, otp_code=otp_code)
-        request.session['change_pw_otp'] = otp_code
 
         email_sent = send_otp_email(request.user, otp_code, purpose="change_password")
+        request.session.pop('change_pw_otp', None)
         if email_sent:
             messages.success(request, f"A new OTP code has been sent to {request.user.email}.")
         else:
-            messages.success(request, f"A new OTP code has been generated for {request.user.email}.")
+            messages.error(request, f"Failed to send OTP email to {request.user.email}. Please try again.")
 
         return redirect("verify_change_password_otp")

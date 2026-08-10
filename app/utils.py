@@ -4,8 +4,20 @@ Sends beautifully branded HTML emails for OTP verification.
 """
 
 import secrets
+import threading
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.conf import settings
+
+
+def _send_email_async(msg, target_email):
+    """Worker thread to dispatch email asynchronously without blocking HTTP response."""
+    try:
+        msg.send(fail_silently=False)
+        if getattr(settings, "DEBUG", False):
+            print(f"[LINO EMAIL SUCCESS] OTP sent to {target_email}")
+    except Exception as exc:
+        if getattr(settings, "DEBUG", False):
+            print(f"[LINO EMAIL ERROR] {target_email}: {exc}")
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -135,12 +147,12 @@ def _build_otp_html(user_name: str, otp_code: str, purpose: str, valid_minutes: 
 # Public Send Function
 # ─────────────────────────────────────────────────────────────────
 
-def send_otp_email(user, otp_code: str, purpose: str = "password_reset", valid_minutes: int = 10) -> bool:
+def send_otp_email(user_or_email, otp_code: str, purpose: str = "password_reset", valid_minutes: int = 10) -> bool:
     """
-    Send a branded LINO OTP email.
+    Send a branded LINO OTP email asynchronously.
 
     Args:
-        user          : Django User object
+        user_or_email : Django User object or email address string
         otp_code      : 6-digit OTP string
         purpose       : 'password_reset' | 'change_password' | 'verify_email'
         valid_minutes : OTP validity window shown in email
@@ -154,8 +166,14 @@ def send_otp_email(user, otp_code: str, purpose: str = "password_reset", valid_m
         "verify_email":    "LINO - Email Verification OTP",
     }
 
-    subject    = purpose_subjects.get(purpose, "LINO - Your OTP Code")
-    user_name  = user.get_full_name() or user.username
+    subject = purpose_subjects.get(purpose, "LINO - Your OTP Code")
+    if hasattr(user_or_email, 'email'):
+        target_email = user_or_email.email
+        user_name = user_or_email.get_full_name() or user_or_email.username
+    else:
+        target_email = str(user_or_email).strip().lower()
+        user_name = target_email.split('@')[0]
+
     from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "LINO Atelier <mylino2026@gmail.com>")
     html_body  = _build_otp_html(user_name, otp_code, purpose, valid_minutes)
 
@@ -173,13 +191,17 @@ def send_otp_email(user, otp_code: str, purpose: str = "password_reset", valid_m
             subject=subject,
             body=plain_body,
             from_email=from_email,
-            to=[user.email],
+            to=[target_email],
             connection=connection,
         )
         msg.attach_alternative(html_body, "text/html")
-        msg.send(fail_silently=False)
+
+        # Spawn non-blocking background thread for instant UI response
+        email_thread = threading.Thread(target=_send_email_async, args=(msg, target_email), daemon=True)
+        email_thread.start()
         return True
     except Exception as exc:
         if getattr(settings, "DEBUG", False):
-            print(f"[LINO EMAIL ERROR] {user.email}: {exc}")
+            print(f"[LINO EMAIL ERROR] {target_email}: {exc}")
         return False
+
