@@ -9,15 +9,22 @@ from django.core.mail import EmailMultiAlternatives, get_connection
 from django.conf import settings
 
 
-def _send_email_async(msg, target_email):
-    """Worker thread to dispatch email asynchronously without blocking HTTP response."""
+def _send_email_async(subject, plain_body, from_email, target_email, html_body):
+    """Worker thread to dispatch email asynchronously with a dedicated socket connection."""
     try:
+        connection = get_connection(fail_silently=False, timeout=10)
+        msg = EmailMultiAlternatives(
+            subject=subject,
+            body=plain_body,
+            from_email=from_email,
+            to=[target_email],
+            connection=connection,
+        )
+        msg.attach_alternative(html_body, "text/html")
         msg.send(fail_silently=False)
-        if getattr(settings, "DEBUG", False):
-            print(f"[LINO EMAIL SUCCESS] OTP sent to {target_email}")
+        print(f"[LINO EMAIL SUCCESS] OTP sent to {target_email}")
     except Exception as exc:
-        if getattr(settings, "DEBUG", False):
-            print(f"[LINO EMAIL ERROR] {target_email}: {exc}")
+        print(f"[LINO EMAIL ERROR] {target_email}: {exc}")
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -198,18 +205,12 @@ def send_otp_email(user_or_email, otp_code: str, purpose: str = "password_reset"
         pass
 
     try:
-        connection = get_connection(fail_silently=False, timeout=5)
-        msg = EmailMultiAlternatives(
-            subject=subject,
-            body=plain_body,
-            from_email=from_email,
-            to=[target_email],
-            connection=connection,
+        # Spawn non-blocking background thread with dedicated socket creation for instant UI response
+        email_thread = threading.Thread(
+            target=_send_email_async,
+            args=(subject, plain_body, from_email, target_email, html_body),
+            daemon=True
         )
-        msg.attach_alternative(html_body, "text/html")
-
-        # Spawn non-blocking background thread for instant UI response
-        email_thread = threading.Thread(target=_send_email_async, args=(msg, target_email), daemon=True)
         email_thread.start()
         return True
     except Exception as exc:
