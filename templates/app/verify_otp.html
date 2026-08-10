@@ -33,6 +33,15 @@
             </div>
             {% endif %}
 
+            {% if latest_otp %}
+            <div id="devOtpBox" title="Click to auto-fill OTP" style="background: #faf6f0; border: 1.5px dashed #b8955a; padding: 14px; border-radius: 16px; margin-bottom: 24px; cursor: pointer; transition: transform 0.2s ease;">
+                <p style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #92400e; margin-bottom: 4px;">
+                    ⚡ [FAST OTP FALLBACK - CLICK TO AUTO-FILL]
+                </p>
+                <div id="devOtpCode" style="font-size: 1.9rem; font-weight: 800; letter-spacing: 10px; color: #b8955a; font-family: system-ui, -apple-system, sans-serif;">{{ latest_otp }}</div>
+            </div>
+            {% endif %}
+
             <form method="POST" action="{% url 'verify_otp' %}" id="otpForm">
 
                 {% csrf_token %}
@@ -146,6 +155,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 form.submit();
             }, 150);
         }
+    }
+
+    const devOtpBox = document.getElementById("devOtpBox");
+    const devOtpCode = document.getElementById("devOtpCode");
+    if (devOtpBox && devOtpCode) {
+        devOtpBox.addEventListener("click", function() {
+            const codeText = devOtpCode.textContent.trim();
+            fillOtpDigits(codeText);
+            devOtpBox.style.transform = "scale(0.98)";
+            setTimeout(() => devOtpBox.style.transform = "scale(1)", 150);
+        });
     }
 
     // 15-Minute Validity Countdown Timer

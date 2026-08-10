@@ -765,7 +765,10 @@ class ForgotPasswordView(View):
                 request.session['latest_otp'] = otp_code
 
                 email_sent = send_otp_email(user, otp_code, purpose="password_reset")
-                request.session.pop('latest_otp', None)
+                if not getattr(settings, "SHOW_TEST_OTP", False):
+                    request.session.pop('latest_otp', None)
+                else:
+                    request.session['latest_otp'] = otp_code
 
                 if email_sent:
                     messages.success(request, f"A 6-digit OTP code has been sent to {email}. Please check your inbox and Spam/Junk folder.")
@@ -789,9 +792,11 @@ class VerifyOTPView(View):
             messages.error(request, "Please enter your email to request a password reset OTP.")
             return redirect("forgot_password")
         form = VerifyOTPForm()
+        latest_otp = request.session.get('latest_otp') if getattr(settings, "SHOW_TEST_OTP", False) else None
         return render(request, self.template_name, {
             "form": form,
             "email": email,
+            "latest_otp": latest_otp,
         })
 
     def post(self, request):
@@ -831,9 +836,11 @@ class VerifyOTPView(View):
                 messages.error(request, "Account not found. Please restart the reset process.")
                 return redirect("forgot_password")
 
+        latest_otp = request.session.get('latest_otp') if getattr(settings, "SHOW_TEST_OTP", False) else None
         return render(request, self.template_name, {
             "form": form,
             "email": email,
+            "latest_otp": latest_otp,
         })
 
 
@@ -852,7 +859,10 @@ class ResendOTPView(View):
             PasswordResetOTP.objects.create(user=user, otp_code=otp_code)
 
             email_sent = send_otp_email(user, otp_code, purpose="password_reset")
-            request.session.pop('latest_otp', None)
+            if not getattr(settings, "SHOW_TEST_OTP", False):
+                request.session.pop('latest_otp', None)
+            else:
+                request.session['latest_otp'] = otp_code
 
             if email_sent:
                 messages.success(request, f"A new 6-digit OTP code has been sent to {email}. Check your inbox and Spam folder.")

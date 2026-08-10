@@ -185,6 +185,18 @@ def send_otp_email(user_or_email, otp_code: str, purpose: str = "password_reset"
         f"Warm regards,\nThe LINO Atelier Team"
     )
 
+    # Write to local log file for instant zero-delay access
+    try:
+        from django.utils import timezone
+        log_dir = settings.BASE_DIR / "logs"
+        log_dir.mkdir(exist_ok=True)
+        otp_log_file = log_dir / "otp.log"
+        with open(otp_log_file, "a", encoding="utf-8") as f:
+            now_str = timezone.now().strftime("%Y-%m-%d %H:%M:%S")
+            f.write(f"[{now_str}] Purpose: {purpose} | Target: {target_email} | OTP: {otp_code}\n")
+    except Exception:
+        pass
+
     try:
         connection = get_connection(fail_silently=False, timeout=5)
         msg = EmailMultiAlternatives(
