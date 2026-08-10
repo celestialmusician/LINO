@@ -500,7 +500,7 @@ class PasswordResetOTP(models.Model):
         from django.utils import timezone
         import datetime
         now = timezone.now()
-        return not self.is_used and (now - self.created_at) < datetime.timedelta(minutes=10)
+        return not self.is_used and (now - self.created_at) < datetime.timedelta(minutes=15)
 
     def __str__(self):
         return f"{self.user.email} - OTP: {self.otp_code}"
@@ -535,7 +535,7 @@ class ChangePasswordOTP(models.Model):
         from django.utils import timezone
         import datetime
         now = timezone.now()
-        return not self.is_used and (now - self.created_at) < datetime.timedelta(minutes=10)
+        return not self.is_used and (now - self.created_at) < datetime.timedelta(minutes=15)
 
     def __str__(self):
         return f"{self.user.email} - Change PW OTP: {self.otp_code}"

@@ -66,8 +66,11 @@
             </form>
 
             <div style="margin-top: 24px; font-size: 0.88rem; color: #666;">
-                <span id="timerContainer">Resend OTP in <strong id="countdownTimer" style="color: #b8955a; font-weight: 700;">00:60</strong></span>
-                <a href="{% url 'resend_otp' %}" id="resendBtn" style="display: none; color: #b8955a; font-weight: 600; text-decoration: underline;">Resend OTP Now</a>
+                <p style="margin-bottom: 8px;">OTP valid for <strong id="validityTimer" style="color: #b8955a; font-weight: 700;">15:00</strong></p>
+                <div style="font-size: 0.83rem; color: #777;">
+                    <span id="resendWait">Didn't receive email? Resend available in <strong id="resendTimer" style="color: #b8955a; font-weight: 600;">30s</strong></span>
+                    <a href="{% url 'resend_otp' %}" id="resendBtn" style="display: none; color: #b8955a; font-weight: 600; text-decoration: underline;">Resend OTP Now</a>
+                </div>
             </div>
 
             <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #f0f0ec;">
@@ -145,21 +148,36 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // 60-second countdown timer
-    let timeLeft = 60;
-    const timerElem = document.getElementById("countdownTimer");
-    const timerContainer = document.getElementById("timerContainer");
-    const resendBtn = document.getElementById("resendBtn");
-
-    const timerInterval = setInterval(function () {
-        timeLeft--;
-        if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            timerContainer.style.display = "none";
-            resendBtn.style.display = "inline-block";
+    // 15-Minute Validity Countdown Timer
+    let validitySeconds = 900; // 15 minutes
+    const validityTimerElem = document.getElementById("validityTimer");
+    const validityInterval = setInterval(function () {
+        validitySeconds--;
+        if (validitySeconds <= 0) {
+            clearInterval(validityInterval);
+            validityTimerElem.textContent = "Expired";
+            validityTimerElem.style.color = "#dc2626";
         } else {
-            const sec = timeLeft < 10 ? "0" + timeLeft : timeLeft;
-            timerElem.textContent = "00:" + sec;
+            const m = Math.floor(validitySeconds / 60).toString().padStart(2, '0');
+            const s = (validitySeconds % 60).toString().padStart(2, '0');
+            validityTimerElem.textContent = `${m}:${s}`;
+        }
+    }, 1000);
+
+    // 30-Second Quick Resend Timer
+    let resendSeconds = 30;
+    const resendTimerElem = document.getElementById("resendTimer");
+    const resendWaitElem = document.getElementById("resendWait");
+    const resendBtnElem = document.getElementById("resendBtn");
+
+    const resendInterval = setInterval(function () {
+        resendSeconds--;
+        if (resendSeconds <= 0) {
+            clearInterval(resendInterval);
+            if (resendWaitElem) resendWaitElem.style.display = "none";
+            if (resendBtnElem) resendBtnElem.style.display = "inline-block";
+        } else {
+            if (resendTimerElem) resendTimerElem.textContent = `${resendSeconds}s`;
         }
     }, 1000);
 });

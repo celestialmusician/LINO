@@ -147,7 +147,7 @@ def _build_otp_html(user_name: str, otp_code: str, purpose: str, valid_minutes: 
 # Public Send Function
 # ─────────────────────────────────────────────────────────────────
 
-def send_otp_email(user_or_email, otp_code: str, purpose: str = "password_reset", valid_minutes: int = 10) -> bool:
+def send_otp_email(user_or_email, otp_code: str, purpose: str = "password_reset", valid_minutes: int = 15) -> bool:
     """
     Send a branded LINO OTP email asynchronously.
 
