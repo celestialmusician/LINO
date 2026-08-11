@@ -176,28 +176,15 @@ RAZORPAY_KEY_SECRET = config('RAZORPAY_KEY_SECRET', default='lino_dummy_secret')
 # EMAIL SMTP SETTINGS (REAL EMAIL DISPATCH)
 # ==========================================
 
-EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='mylino2026@gmail.com')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='wjhzgmbfivjjylhe').replace(' ', '').strip()
-
-# Fallback to console backend if password is empty or placeholder
-is_dummy_password = (
-    not EMAIL_HOST_PASSWORD
-    or 'your_gmail' in EMAIL_HOST_PASSWORD.lower()
-    or 'placeholder' in EMAIL_HOST_PASSWORD.lower()
-    or 'xxxx' in EMAIL_HOST_PASSWORD.lower()
-)
-
-if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD and not is_dummy_password:
-    EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
-else:
-    EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
-
-EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
-EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
-EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
-EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=False, cast=bool)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = 'mylino2026@gmail.com'
+EMAIL_HOST_PASSWORD = 'irldxyvlyyhryxwl'
 EMAIL_TIMEOUT = 10  # 10 seconds max socket timeout to prevent server hanging
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default=config('EMAIL_HOST_USER', default='LINO Atelier <mylino2026@gmail.com>'))
-SHOW_TEST_OTP = config('SHOW_TEST_OTP', default=False, cast=bool)
-RESEND_API_KEY = config('RESEND_API_KEY', default='')
-BREVO_API_KEY = config('BREVO_API_KEY', default='')
+DEFAULT_FROM_EMAIL = 'LINO Atelier <mylino2026@gmail.com>'
+SHOW_TEST_OTP = False
+
+
